@@ -6,11 +6,12 @@ import TranspixForm from './components/TranspixForm';
 import TranscomprasForm from './components/TranscomprasForm';
 import TranspixCadastralForm from './components/TranspixCadastralForm';
 import TranscomprasCadastralForm from './components/TranscomprasCadastralForm';
+import TrackingForm from './components/TrackingForm';
 import logo from './assets/logofinal.png'; // Importe sua logo aqui
 
 const App: React.FC = () => {
     const [screen, setScreen] = useState<
-        'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral'
+        'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking'
     >('home');
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [showInstall, setShowInstall] = useState(false);
@@ -81,6 +82,12 @@ const App: React.FC = () => {
                         onClick={() => setScreen('transcomprasCadastral')}
                     >
                         📦 Dados cadastrais Transcompras
+                    </button>
+                    <button
+                        className="btn btn-outline-primary m-2"
+                        onClick={() => setScreen('tracking')}
+                    >
+                        📄 Texto para rastreio de NF
                     </button>
                     {/* Botão de instalar app em uma linha separada */}
                     {showInstall && (
@@ -159,6 +166,17 @@ const App: React.FC = () => {
                         &larr; Voltar
                     </button>
                     <TranscomprasCadastralForm />
+                </>
+            )}
+            {screen === 'tracking' && (
+                <>
+                    <button
+                        className="btn btn-dark mb-3"
+                        onClick={() => setScreen('home')}
+                    >
+                        &larr; Voltar
+                    </button>
+                    <TrackingForm />
                 </>
             )}
         </div>
