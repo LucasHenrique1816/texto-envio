@@ -1,46 +1,57 @@
 import React, { useState } from 'react';
 
-const TranscomprasForm: React.FC = () => {
-    const [quotationNumber, setQuotationNumber] = useState('');
-    const [nfNumber, setNfNumber] = useState('');
-    const [value, setValue] = useState('');
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [whatsNumber, setWhatsNumber] = useState('');
-
+const TranspixCadastralForm: React.FC = () => {
+    // Saudação automática conforme o horário
     const getGreeting = () => {
         const hour = new Date().getHours();
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
-    const transcomprasTexto = `${getGreeting()},\n
-📝 Dados da Cotação - NF:\n
-- Número da Cotação: ${quotationNumber}
-- Número da NF: ${nfNumber}
-- Valor: R$ ${value}
-- Frete: À vista, pago pelo emitente.
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [whatsNumber, setWhatsNumber] = useState('');
 
-📋 Dados Bancários:
+    const greeting = getGreeting();
 
-- Chave PIX: faturamento02@transcompras.com.br
-- Banco 382 BDK - Fiducia SCMEPP
-- Agência: 0001
-- C/C: 54105-2
-- Favorecido: Transcompras Transportes e Compras Comerciais Ltda
+    const cadastralTexto = `${greeting},
 
-🚚 Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+📦 Dados Cadastrais
 
-⚠️ Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
+Abaixo seguem os dados cadastrais completos da TRANSPIX - Transportes e Logística LTDA,
 
-🚨Por favor, envie o comprovante de pagamento.
+🧾 Informações Cadastrais
+Razão Social: TRANSPIX - Transportes e Logística LTDA
+
+CNPJ: 33.233.703/0001-19
+
+IE: 796.876.432.112
+
+📍 Endereço Comercial
+Logradouro: Rua João Roberto, Nº 173 – Galpão 1
+
+Bairro: Cidade Industrial Satélite de São Paulo
+
+CEP: 07221-040
+
+Município: Guarulhos – SP
+
+📬 Canais de Contato
+E-mail para Coletas: coleta.sp@transcompras.com.br
+
+E-mail para Cotações: comercial.sp@transcompras.com.br
+
+Telefone Fixo: (11) 3927-2050
+
+WhatsApp: (11) 98317-0750
+
+Caso precise de cotações, agendamentos de coletas ou mais informações, estaremos à disposição para atendê-lo(a) com agilidade e atenção.
 
 Atenciosamente,
 ${name}
-
-🚚💨📦`;
+Equipe TRANSPIX`;
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(transcomprasTexto).then(() => {
+        navigator.clipboard.writeText(cadastralTexto).then(() => {
             alert('Texto copiado para a área de transferência!');
         });
     };
@@ -50,8 +61,8 @@ ${name}
             alert('Digite o email de destino.');
             return;
         }
-        const subject = encodeURIComponent(`Frete a vista Transcompras referente a cotação ${quotationNumber}`);
-        const body = encodeURIComponent(transcomprasTexto);
+        const subject = encodeURIComponent('Dados Cadastrais TRANSPIX');
+        const body = encodeURIComponent(cadastralTexto);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
             '_blank'
@@ -67,51 +78,16 @@ ${name}
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(transcomprasTexto);
+        const text = encodeURIComponent(cadastralTexto);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 
     return (
         <div className="container mt-5">
-            <h2 className="text-white">Texto para envio de Dados Bancários Transcompras</h2>
+            <h2 className="text-white">Envio de Dados Cadastrais TRANSPIX</h2>
             <form className="bg-dark p-4 rounded">
                 <div className="mb-3">
-                    <label className="form-label text-white">
-                        Número da Cotação:
-                    </label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={quotationNumber}
-                        onChange={(e) => setQuotationNumber(e.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label text-white">
-                        Número da NF:
-                    </label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={nfNumber}
-                        onChange={(e) => setNfNumber(e.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label text-white">
-                        Valor:
-                    </label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label text-white">
-                        Nome:
-                    </label>
+                    <label className="form-label text-white">Seu nome:</label>
                     <input
                         type="text"
                         className="form-control"
@@ -120,8 +96,12 @@ ${name}
                         placeholder="Seu nome"
                     />
                 </div>
-                <button type="button" className="btn btn-light me-2" onClick={handleCopy}>
-                    Copiar Dados Bancários
+                <button
+                    type="button"
+                    className="btn btn-light me-2"
+                    onClick={handleCopy}
+                >
+                    Copiar Dados Cadastrais
                 </button>
                 {/* Campo de email e botão Gmail abaixo do botão copiar */}
                 <div className="mb-3 mt-3">
@@ -166,7 +146,7 @@ ${name}
                 <div className="mt-4">
                     <label className="form-label text-white">Pré-visualização:</label>
                     <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
-                        {transcomprasTexto}
+                        {cadastralTexto}
                     </pre>
                 </div>
             </form>
@@ -174,4 +154,4 @@ ${name}
     );
 };
 
-export default TranscomprasForm;
+export default TranspixCadastralForm;

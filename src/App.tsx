@@ -4,10 +4,14 @@ import QuotationForm from './components/QuotationForm';
 import CollectionForm from './components/CollectionForm';
 import TranspixForm from './components/TranspixForm';
 import TranscomprasForm from './components/TranscomprasForm';
+import TranspixCadastralForm from './components/TranspixCadastralForm';
+import TranscomprasCadastralForm from './components/TranscomprasCadastralForm';
 import logo from './assets/logofinal.png'; // Importe sua logo aqui
 
 const App: React.FC = () => {
-    const [screen, setScreen] = useState<'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras'>('home');
+    const [screen, setScreen] = useState<
+        'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral'
+    >('home');
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [showInstall, setShowInstall] = useState(false);
 
@@ -66,11 +70,23 @@ const App: React.FC = () => {
                     >
                         💰 Texto para dados bancários Transcompras
                     </button>
+                    <button
+                        className="btn btn-info m-2"
+                        onClick={() => setScreen('transpixCadastral')}
+                    >
+                        📦 Dados cadastrais Transpix
+                    </button>
+                    <button
+                        className="btn btn-danger m-2"
+                        onClick={() => setScreen('transcomprasCadastral')}
+                    >
+                        📦 Dados cadastrais Transcompras
+                    </button>
                     {/* Botão de instalar app em uma linha separada */}
                     {showInstall && (
                         <div className="mt-4">
                             <button
-                                className="btn btn-info"
+                                className="btn btn-dark"
                                 onClick={handleInstallClick}
                             >
                                 ⬇️ Instalar App
@@ -93,7 +109,7 @@ const App: React.FC = () => {
             {screen === 'collection' && (
                 <>
                     <button
-                        className="btn btn-primary mb-3"
+                        className="btn btn-secondary mb-3"
                         onClick={() => setScreen('home')}
                     >
                         &larr; Voltar
@@ -104,7 +120,7 @@ const App: React.FC = () => {
             {screen === 'transpix' && (
                 <>
                     <button
-                        className="btn btn-primary mb-3"
+                        className="btn btn-success mb-3"
                         onClick={() => setScreen('home')}
                     >
                         &larr; Voltar
@@ -115,12 +131,34 @@ const App: React.FC = () => {
             {screen === 'transcompras' && (
                 <>
                     <button
-                        className="btn btn-primary mb-3"
+                        className="btn btn-warning mb-3"
                         onClick={() => setScreen('home')}
                     >
                         &larr; Voltar
                     </button>
                     <TranscomprasForm />
+                </>
+            )}
+            {screen === 'transpixCadastral' && (
+                <>
+                    <button
+                        className="btn btn-info mb-3"
+                        onClick={() => setScreen('home')}
+                    >
+                        &larr; Voltar
+                    </button>
+                    <TranspixCadastralForm />
+                </>
+            )}
+            {screen === 'transcomprasCadastral' && (
+                <>
+                    <button
+                        className="btn btn-danger mb-3"
+                        onClick={() => setScreen('home')}
+                    >
+                        &larr; Voltar
+                    </button>
+                    <TranscomprasCadastralForm />
                 </>
             )}
         </div>

@@ -5,17 +5,71 @@ const TranspixForm: React.FC = () => {
     const [nfNumber, setNfNumber] = useState('');
     const [value, setValue] = useState('');
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [whatsNumber, setWhatsNumber] = useState('');
 
     const getGreeting = () => {
         const hour = new Date().getHours();
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
+    const transpixTexto = `${getGreeting()},\n
+📝 Dados da Cotação - NF:\n
+- Número da Cotação: ${quotationNumber}
+- Número da NF: ${nfNumber}
+- Valor: R$ ${value}
+- Frete: À vista.
+
+📋 Dados Bancários:
+
+- Chave PIX: 33.233.703/0001-19
+- Banco: Bradesco
+- Agência: 2514
+- C/C: 61330-4
+- Favorecido: Transpix Transportes e Logística Ltda.
+- CNPJ: 33.233.703/0001-19
+
+🚚 Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+
+⚠️ Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
+
+🚨Por favor, envie o comprovante de pagamento.
+
+Atenciosamente,
+${name}
+
+🚚💨📦`;
+
     const handleCopy = () => {
-        const textToCopy = `${getGreeting()},\n\n📝 Dados da Cotação - NF:\n\n- Número da Cotação: ${quotationNumber}\n- Número da NF: ${nfNumber}\n- Valor: R$ ${value}\n- Frete: À vista.\n\n📋 Dados Bancários:\n\n- Chave PIX: 33.233.703/0001-19\n- Banco: Bradesco\n- Agência: 2514\n- C/C: 61330-4\n- Favorecido: Transpix Transportes e Logística Ltda.\n- CNPJ: 33.233.703/0001-19\n\n🚚 Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.\n\n⚠️ Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.\n\n🚨Por favor, envie o comprovante de pagamento.\n\nAtenciosamente,\n${name}\n\n🚚💨📦`;
-        navigator.clipboard.writeText(textToCopy).then(() => {
+        navigator.clipboard.writeText(transpixTexto).then(() => {
             alert('Texto copiado para a área de transferência!');
         });
+    };
+
+    const handleSendGmail = () => {
+        if (!email) {
+            alert('Digite o email de destino.');
+            return;
+        }
+        const subject = encodeURIComponent(`Frete a vista Transpix refrente a Cotação ${quotationNumber}`);
+        const body = encodeURIComponent(transpixTexto);
+        window.open(
+            `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
+            '_blank'
+        );
+    };
+
+    const handleSendWhatsApp = () => {
+        if (!whatsNumber) {
+            alert('Digite o número do WhatsApp.');
+            return;
+        }
+        let number = whatsNumber.replace(/\D/g, '');
+        if (number.length === 11) {
+            number = '55' + number;
+        }
+        const text = encodeURIComponent(transpixTexto);
+        window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 
     return (
@@ -67,38 +121,53 @@ const TranspixForm: React.FC = () => {
                         placeholder="Seu nome"
                     />
                 </div>
-                <button type="button" className="btn btn-light" onClick={handleCopy}>
+                <button type="button" className="btn btn-light me-2" onClick={handleCopy}>
                     Copiar Dados Bancários
                 </button>
+                {/* Campo de email e botão Gmail abaixo do botão copiar */}
+                <div className="mb-3 mt-3">
+                    <label className="form-label text-white">
+                        Email para envio:
+                    </label>
+                    <input
+                        type="email"
+                        className="form-control mb-2"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="destinatario@exemplo.com"
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-danger me-2"
+                        onClick={handleSendGmail}
+                    >
+                        Enviar Dados pelo Gmail
+                    </button>
+                </div>
+                {/* Campo e botão WhatsApp */}
+                <div className="mb-3">
+                    <label className="form-label text-white">
+                        WhatsApp para envio:
+                    </label>
+                    <input
+                        type="tel"
+                        className="form-control mb-2"
+                        value={whatsNumber}
+                        onChange={(e) => setWhatsNumber(e.target.value)}
+                        placeholder="Ex: 11999999999"
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={handleSendWhatsApp}
+                    >
+                        Enviar Dados pelo WhatsApp
+                    </button>
+                </div>
                 <div className="mt-4">
                     <label className="form-label text-white">Pré-visualização:</label>
                     <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
-{`${getGreeting()},\n
-📝 Dados da Cotação - NF:\n
-- Número da Cotação: ${quotationNumber}
-- Número da NF: ${nfNumber}
-- Valor: R$ ${value}
-- Frete: À vista.
-
-📋 Dados Bancários:
-
-- Chave PIX: 33.233.703/0001-19
-- Banco: Bradesco
-- Agência: 2514
-- C/C: 61330-4
-- Favorecido: Transpix Transportes e Logística Ltda.
-- CNPJ: 33.233.703/0001-19
-
-🚚 Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
-
-⚠️ Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
-
-🚨Por favor, envie o comprovante de pagamento.
-
-Atenciosamente,
-${name}
-
-🚚💨📦`}
+                        {transpixTexto}
                     </pre>
                 </div>
             </form>
