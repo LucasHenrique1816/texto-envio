@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import QuotationForm from './components/QuotationForm';
 import CollectionForm from './components/CollectionForm';
@@ -8,6 +8,29 @@ import logo from './assets/logofinal.png'; // Importe sua logo aqui
 
 const App: React.FC = () => {
     const [screen, setScreen] = useState<'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras'>('home');
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [showInstall, setShowInstall] = useState(false);
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setShowInstall(true);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
+
+    const handleInstallClick = () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+                setDeferredPrompt(null);
+                setShowInstall(false);
+            });
+        }
+    };
 
     return (
         <div className="container mt-5">
@@ -43,6 +66,17 @@ const App: React.FC = () => {
                     >
                         💰 Texto para dados bancários Transcompras
                     </button>
+                    {/* Botão de instalar app em uma linha separada */}
+                    {showInstall && (
+                        <div className="mt-4">
+                            <button
+                                className="btn btn-info"
+                                onClick={handleInstallClick}
+                            >
+                                ⬇️ Instalar App
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
             {screen === 'quotation' && (
