@@ -13,6 +13,7 @@ const TranspixCadastralForm: React.FC = () => {
 
     const greeting = getGreeting();
 
+    // Texto com emojis (para cópia, email, preview)
     const cadastralTexto = `${greeting},
 
 📦 Dados Cadastrais
@@ -36,6 +37,44 @@ CEP: 07221-040
 Município: Guarulhos – SP
 
 📬 Canais de Contato
+E-mail para Coletas: coleta.sp@transcompras.com.br
+
+E-mail para Cotações: comercial.sp@transcompras.com.br
+
+Telefone Fixo: (11) 3927-2050
+
+WhatsApp: (11) 98317-0750
+
+Caso precise de cotações, agendamentos de coletas ou mais informações, estaremos à disposição para atendê-lo(a) com agilidade e atenção.
+
+Atenciosamente,
+${name}
+Equipe TRANSPIX`;
+
+    // Texto sem emojis (para WhatsApp)
+    const cadastralTextoWhats = `${greeting},
+
+Dados Cadastrais
+
+Abaixo seguem os dados cadastrais completos da TRANSPIX - Transportes e Logística LTDA,
+
+Informações Cadastrais
+Razão Social: TRANSPIX - Transportes e Logística LTDA
+
+CNPJ: 33.233.703/0001-19
+
+IE: 796.876.432.112
+
+Endereço Comercial
+Logradouro: Rua João Roberto, Nº 173 – Galpão 1
+
+Bairro: Cidade Industrial Satélite de São Paulo
+
+CEP: 07221-040
+
+Município: Guarulhos – SP
+
+Canais de Contato
 E-mail para Coletas: coleta.sp@transcompras.com.br
 
 E-mail para Cotações: comercial.sp@transcompras.com.br
@@ -78,7 +117,7 @@ Equipe TRANSPIX`;
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(cadastralTexto);
+        const text = encodeURIComponent(cadastralTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 

@@ -14,6 +14,7 @@ const CollectionForm: React.FC = () => {
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
+    // Texto com emojis (para cópia, email, preview)
     const coletaTexto = `${getGreeting()},\n
 Segue abaixo dados da coleta:\n
 Coleta: ${collectionNumber}
@@ -29,6 +30,22 @@ Atenciosamente,
 ${name}
 
 🚚💨💨📦`;
+
+    // Texto sem emojis (para WhatsApp)
+    const coletaTextoWhats = `${getGreeting()},\n
+Segue abaixo dados da coleta:\n
+Coleta: ${collectionNumber}
+Transportadora: ${carrier}
+
+Prazo de retirada de 24 a 48 horas a partir do dia seguinte da solicitação.
+
+Dúvidas, estamos à disposição.
+
+Desculpe pela demora.
+
+Atenciosamente,
+${name}
+`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(coletaTexto).then(() => {
@@ -58,7 +75,7 @@ ${name}
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(coletaTexto);
+        const text = encodeURIComponent(coletaTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 

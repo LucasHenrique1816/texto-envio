@@ -13,6 +13,7 @@ const TranscomprasCadastralForm: React.FC = () => {
 
     const greeting = getGreeting();
 
+    // Texto com emojis (para cópia, email, preview)
     const cadastralTexto = `${greeting},
 
 📦 Dados Cadastrais
@@ -36,6 +37,44 @@ CEP: 07221-040
 Município: Guarulhos – SP
 
 📬 Canais de Contato
+E-mail para Coletas: coleta.sp@transcompras.com.br
+
+E-mail para Cotações: comercial.sp@transcompras.com.br
+
+Telefone Fixo: (11) 3927-2050
+
+WhatsApp: (11) 98317-0750
+
+Caso precise de cotações, agendamentos de coletas ou mais informações, estaremos à disposição para atendê-lo(a) com agilidade e atenção.
+
+Atenciosamente,
+${name}
+Equipe TRANSCOMPRAS`;
+
+    // Texto sem emojis (para WhatsApp)
+    const cadastralTextoWhats = `${greeting},
+
+Dados Cadastrais
+
+Abaixo seguem os dados cadastrais completos da TRANSCOMPRAS – Transporte e Compras Comerciais LTDA,
+
+Informações Cadastrais
+Razão Social: TRANSCOMPRAS – Transporte e Compras Comerciais LTDA
+
+CNPJ: 32.717.811/0002-85
+
+IE: 336.252.554.113
+
+Endereço Comercial
+Logradouro: Rua João Roberto, Nº 173
+
+Bairro: Cidade Industrial Satélite de São Paulo
+
+CEP: 07221-040
+
+Município: Guarulhos – SP
+
+Canais de Contato
 E-mail para Coletas: coleta.sp@transcompras.com.br
 
 E-mail para Cotações: comercial.sp@transcompras.com.br
@@ -78,7 +117,7 @@ Equipe TRANSCOMPRAS`;
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(cadastralTexto);
+        const text = encodeURIComponent(cadastralTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 
@@ -86,7 +125,6 @@ Equipe TRANSCOMPRAS`;
         <div className="container mt-5">
             <h2 className="text-white">Envio de Dados Cadastrais TRANSCOMPRAS</h2>
             <form className="bg-dark p-4 rounded">
-                {/* Saudação automática removida do input */}
                 <div className="mb-3">
                     <label className="form-label text-white">Seu nome:</label>
                     <input

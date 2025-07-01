@@ -17,6 +17,7 @@ const QuotationForm: React.FC = () => {
 
     const freteText = `Pago pelo ${payer}${freteAVista ? ' à vista' : ''} (sujeito a alteração se houver divergência nos dados informados).`;
 
+    // Texto com emojis (para cópia, email, preview)
     const cotacaoTexto = `${getGreeting()},\n
 📝 Dados da Cotação:\n
 - Numero da Cotação: ${quotationNumber}
@@ -34,6 +35,24 @@ Atenciosamente,
 ${name}
 
 🚚💨📦`;
+
+    // Texto sem emojis (para WhatsApp)
+    const cotacaoTextoWhats = `${getGreeting()},\n
+Dados da Cotação:\n
+- Numero da Cotação: ${quotationNumber}
+- Valor: R$ ${value}
+- Transportadora: ${carrier}
+- Frete: ${freteText}
+- Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+- Validade da cotação: 30 dias.
+
+Dúvidas ou negociações? Estamos à disposição!
+
+Desculpe pela demora e obrigado pela paciência.
+
+Atenciosamente,
+${name}
+`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(cotacaoTexto).then(() => {
@@ -59,12 +78,11 @@ ${name}
             alert('Digite o número do WhatsApp.');
             return;
         }
-        // Remove caracteres não numéricos e adiciona DDI se necessário
         let number = whatsNumber.replace(/\D/g, '');
         if (number.length === 11) {
-            number = '55' + number; // Adiciona DDI do Brasil se não tiver
+            number = '55' + number;
         }
-        const text = encodeURIComponent(cotacaoTexto);
+        const text = encodeURIComponent(cotacaoTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 

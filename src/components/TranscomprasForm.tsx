@@ -13,6 +13,7 @@ const TranscomprasForm: React.FC = () => {
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
+    // Texto com emojis (para cópia, email, preview)
     const transcomprasTexto = `${getGreeting()},\n
 📝 Dados da Cotação - NF:\n
 - Número da Cotação: ${quotationNumber}
@@ -39,6 +40,32 @@ ${name}
 
 🚚💨📦`;
 
+    // Texto sem emojis (para WhatsApp)
+    const transcomprasTextoWhats = `${getGreeting()},\n
+Dados da Cotação - NF:\n
+- Número da Cotação: ${quotationNumber}
+- Número da NF: ${nfNumber}
+- Valor: R$ ${value}
+- Frete: À vista, pago pelo emitente.
+
+Dados Bancários:
+
+- Chave PIX: faturamento02@transcompras.com.br
+- Banco 382 BDK - Fiducia SCMEPP
+- Agência: 0001
+- C/C: 54105-2
+- Favorecido: Transcompras Transportes e Compras Comerciais Ltda
+
+Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+
+Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
+
+Por favor, envie o comprovante de pagamento.
+
+Atenciosamente,
+${name}
+`;
+
     const handleCopy = () => {
         navigator.clipboard.writeText(transcomprasTexto).then(() => {
             alert('Texto copiado para a área de transferência!');
@@ -50,7 +77,7 @@ ${name}
             alert('Digite o email de destino.');
             return;
         }
-        const subject = encodeURIComponent(`Frete a vista Transcompras referente a cotação ${quotationNumber}`);
+        const subject = encodeURIComponent(`Frete a vista Transcompras ------ URGENTE!!!!!!`);
         const body = encodeURIComponent(transcomprasTexto);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
@@ -67,7 +94,7 @@ ${name}
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(transcomprasTexto);
+        const text = encodeURIComponent(transcomprasTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 

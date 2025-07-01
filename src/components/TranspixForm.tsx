@@ -13,6 +13,7 @@ const TranspixForm: React.FC = () => {
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
+    // Texto com emojis (para cópia, email, preview)
     const transpixTexto = `${getGreeting()},\n
 📝 Dados da Cotação - NF:\n
 - Número da Cotação: ${quotationNumber}
@@ -40,6 +41,33 @@ ${name}
 
 🚚💨📦`;
 
+    // Texto sem emojis (para WhatsApp)
+    const transpixTextoWhats = `${getGreeting()},\n
+Dados da Cotação - NF:\n
+- Número da Cotação: ${quotationNumber}
+- Número da NF: ${nfNumber}
+- Valor: R$ ${value}
+- Frete: À vista.
+
+Dados Bancários:
+
+- Chave PIX: 33.233.703/0001-19
+- Banco: Bradesco
+- Agência: 2514
+- C/C: 61330-4
+- Favorecido: Transpix Transportes e Logística Ltda.
+- CNPJ: 33.233.703/0001-19
+
+Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+
+Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
+
+Por favor, envie o comprovante de pagamento.
+
+Atenciosamente,
+${name}
+`;
+
     const handleCopy = () => {
         navigator.clipboard.writeText(transpixTexto).then(() => {
             alert('Texto copiado para a área de transferência!');
@@ -51,7 +79,7 @@ ${name}
             alert('Digite o email de destino.');
             return;
         }
-        const subject = encodeURIComponent(`Frete a vista Transpix refrente a Cotação ${quotationNumber}`);
+        const subject = encodeURIComponent(`Frete a vista Transpix ------ URGENTE!!!!!!`);
         const body = encodeURIComponent(transpixTexto);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
@@ -68,7 +96,7 @@ ${name}
         if (number.length === 11) {
             number = '55' + number;
         }
-        const text = encodeURIComponent(transpixTexto);
+        const text = encodeURIComponent(transpixTextoWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 
