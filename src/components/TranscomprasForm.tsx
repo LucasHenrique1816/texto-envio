@@ -7,19 +7,39 @@ const TranscomprasForm: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [whatsNumber, setWhatsNumber] = useState('');
+    const [addMore, setAddMore] = useState(false);
+    const [extraFretes, setExtraFretes] = useState<
+        { quotationNumber: string; nfNumber: string; value: string }[]
+    >([]);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
+    // Soma todos os valores dos fretes
+    const totalFrete = [value, ...extraFretes.map(f => f.value)]
+        .map(v => Number(v.replace(',', '.')) || 0)
+        .reduce((a, b) => a + b, 0);
+
     // Texto com emojis (para cópia, email, preview)
+    const fretesTexto = [
+        `- Número da Cotação: ${quotationNumber}\n- Número da NF: ${nfNumber}\n- Valor: R$ ${value}`,
+        ...extraFretes.map(
+            (f, i) =>
+                `- Número da Cotação: ${f.quotationNumber}\n- Número da NF: ${f.nfNumber}\n- Valor: R$ ${f.value}`
+        ),
+    ].join('\n\n');
+
+    const valorTotalTexto = `Valor total do frete: R$ ${totalFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
     const transcomprasTexto = `${getGreeting()},\n
 📝 Dados da Cotação - NF:\n
-- Número da Cotação: ${quotationNumber}
-- Número da NF: ${nfNumber}
-- Valor: R$ ${value}
-- Frete: À vista, pago pelo emitente.
+${fretesTexto}
+
+${valorTotalTexto}
+
+- Frete: À vista.
 
 📋 Dados Bancários:
 
@@ -43,10 +63,11 @@ ${name}
     // Texto sem emojis (para WhatsApp)
     const transcomprasTextoWhats = `${getGreeting()},\n
 Dados da Cotação - NF:\n
-- Número da Cotação: ${quotationNumber}
-- Número da NF: ${nfNumber}
-- Valor: R$ ${value}
-- Frete: À vista, pago pelo emitente.
+${fretesTexto}
+
+${valorTotalTexto}
+
+- Frete: À vista.
 
 Dados Bancários:
 
@@ -98,6 +119,32 @@ ${name}
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
     };
 
+    // Adiciona um novo frete extra
+    const handleAddFrete = () => {
+        setExtraFretes([
+            ...extraFretes,
+            { quotationNumber: '', nfNumber: '', value: '' },
+        ]);
+    };
+
+    // Atualiza um frete extra
+    const handleChangeFrete = (
+        idx: number,
+        field: 'quotationNumber' | 'nfNumber' | 'value',
+        val: string
+    ) => {
+        setExtraFretes((prev) =>
+            prev.map((f, i) =>
+                i === idx ? { ...f, [field]: val } : f
+            )
+        );
+    };
+
+    // Remove um frete extra
+    const handleRemoveFrete = (idx: number) => {
+        setExtraFretes((prev) => prev.filter((_, i) => i !== idx));
+    };
+
     return (
         <div className="container mt-5">
             <h2 className="text-white">Texto para envio de Dados Bancários Transcompras</h2>
@@ -135,6 +182,73 @@ ${name}
                         onChange={(e) => setValue(e.target.value)}
                     />
                 </div>
+                {/* CHECKBOX ABAIXO DO VALOR */}
+                <div className="form-check mb-3">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="addMore"
+                        checked={addMore}
+                        onChange={() => setAddMore(!addMore)}
+                    />
+                    <label className="form-check-label text-white" htmlFor="addMore">
+                        Adicionar mais cotações/NFs
+                    </label>
+                </div>
+                {addMore && (
+                    <div className="mb-3">
+                        <label className="form-label text-white">
+                            Outras cotações/NFs:
+                        </label>
+                        {extraFretes.map((f, idx) => (
+                            <div key={idx} className="border rounded p-2 mb-2 bg-secondary">
+                                <div className="mb-2">
+                                    <input
+                                        type="text"
+                                        className="form-control mb-1"
+                                        placeholder="Número da Cotação"
+                                        value={f.quotationNumber}
+                                        onChange={e =>
+                                            handleChangeFrete(idx, 'quotationNumber', e.target.value)
+                                        }
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-1"
+                                        placeholder="Número da NF"
+                                        value={f.nfNumber}
+                                        onChange={e =>
+                                            handleChangeFrete(idx, 'nfNumber', e.target.value)
+                                        }
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-1"
+                                        placeholder="Valor"
+                                        value={f.value}
+                                        onChange={e =>
+                                            handleChangeFrete(idx, 'value', e.target.value)
+                                        }
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => handleRemoveFrete(idx)}
+                                >
+                                    Remover
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-light"
+                            onClick={handleAddFrete}
+                        >
+                            + Adicionar Cotação/NF
+                        </button>
+                    </div>
+                )}
                 <div className="mb-3">
                     <label className="form-label text-white">
                         Nome:

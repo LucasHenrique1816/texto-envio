@@ -10,11 +10,12 @@ import TrackingForm from './components/TrackingForm';
 import CorrectionLetterForm from './components/CorrectionLetterForm';
 import FilialContatoForm from './components/FilialContatoForm';
 import TermoIsencaoAvariaForm from './components/TermoIsencaoAvariaForm';
+import AutorizacaoEmbarqueForm from './components/AutorizacaoEmbarqueForm';
 import logo from './assets/logofinal.png';
 
 const App: React.FC = () => {
     const [screen, setScreen] = useState<
-        'setor' | 'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking' | 'correctionLetter' | 'bankData' | 'cadastralData' | 'contatoFilial' | 'termoIsencao'
+        'setor' | 'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking' | 'correctionLetter' | 'bankData' | 'cadastralData' | 'contatoFilial' | 'termoIsencao' | 'autorizacaoEmbarque'
     >('setor');
     const [setor, setSetor] = useState<'comercial' | 'pendencia' | null>(null);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -181,6 +182,12 @@ const App: React.FC = () => {
                         >
                             📝 Solicitação de Termo de Isenção de Avaria
                         </button>
+                        <button
+                            className="btn btn-outline-primary m-2"
+                            onClick={() => setScreen('autorizacaoEmbarque')}
+                        >
+                            🚚 Solicitação de Autorização de Embarque
+                        </button>
                     </>
                 )}
             </div>
@@ -290,6 +297,7 @@ const App: React.FC = () => {
     if (screen === 'tracking') return renderScreenWithLogo(TrackingForm, 'home', "btn btn-dark");
     if (screen === 'correctionLetter') return renderScreenWithLogo(CorrectionLetterForm, 'home', "btn btn-outline-warning");
     if (screen === 'termoIsencao') return renderScreenWithLogo(TermoIsencaoAvariaForm, 'home', "btn btn-outline-danger");
+    if (screen === 'autorizacaoEmbarque') return renderScreenWithLogo(AutorizacaoEmbarqueForm, 'home', "btn btn-outline-primary");
 
     return null;
 };

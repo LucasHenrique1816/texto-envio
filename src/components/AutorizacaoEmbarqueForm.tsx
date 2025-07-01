@@ -1,77 +1,72 @@
 import React, { useState } from 'react';
 
-const transportadoras = [
-    
-    {
-        nome: 'Transpix',
-        razao: 'TRANSPIX - Transportes e Logística LTDA',
-        cnpj: '33.233.703/0001-19',
-    },
-    {
-        nome: 'Transcompras',
-        razao: 'Transcompras - Transporte e Compras Comerciais LTDA',
-        cnpj: '32.717.811/0002-85',
-    },
-];
-
-const getGreeting = () => {
-    const hour = new Date().getHours();
-    return hour < 12 ? 'Bom dia' : 'Boa tarde';
-};
-
-const TermoIsencaoAvariaForm: React.FC = () => {
+const AutorizacaoEmbarqueForm: React.FC = () => {
     const [nfNumber, setNfNumber] = useState('');
-    const [transportadora, setTransportadora] = useState(transportadoras[0].nome);
+    const [quotationNumber, setQuotationNumber] = useState('');
+    const [freightValue, setFreightValue] = useState('');
+    const [carrier, setCarrier] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [whatsNumber, setWhatsNumber] = useState('');
-    const [nome, setNome] = useState('');
 
-    const greeting = getGreeting();
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        return hour < 12 ? 'Bom dia' : 'Boa tarde';
+    };
 
-    const dadosTransportadora = transportadoras.find(t => t.nome === transportadora);
-
-    const textoComEmojis = `${greeting}, tudo bem? 📩
+    const textoComEmojis = `${getGreeting()}, tudo bem? 📩
 ✉️ Por gentileza, confirmar o recebimento desta mensagem.
 
-🚨 Solicitamos Termo de Isenção de avaria para a seguinte NF:
+🚨 Solicitamos a Autorização para Embarque do frete abaixo:
 
-🧾 Número da NF: ${nfNumber}
-
-🚚 Transportadora: ${dadosTransportadora?.razao} (${dadosTransportadora?.cnpj})
-
-📌 Observação Importante:
-A mercadoria só poderá ser embarcada após o envio do termo de isenção devidamente preenchido e assinado.
-
-⏳ Urgência:
-Aguardamos o documento o quanto antes para emissão do CT-e e prosseguimento com o embarque.
-
-Desde já, agradecemos pela atenção e colaboração!
-
-Atenciosamente,
-${nome}
-
-🚚💨📦
-`;
-
-    const textoSemEmojis = `${greeting}, tudo bem?
-Por gentileza, confirmar o recebimento desta mensagem.
-
-Solicitamos Termo de Isenção de avaria para a seguinte NF:
+🧾 Dados do Frete:
 
 Número da NF: ${nfNumber}
 
-Transportadora: ${dadosTransportadora?.razao} (${dadosTransportadora?.cnpj})
+Número da Cotação: ${quotationNumber}
 
-Observação Importante:
-A mercadoria só poderá ser embarcada após o envio do termo de isenção devidamente preenchido e assinado.
+Valor do Frete: R$ ${freightValue}
 
-Urgência:
-Aguardamos o documento o quanto antes para emissão do CT-e e prosseguimento com o embarque.
+Transportadora: ${carrier}
 
-Desde já, agradecemos pela atenção e colaboração!
+📌 Observação Importante:
+A mercadoria só será embarcada mediante autorização da empresa contratante.
+
+⏳ Urgência:
+Solicitamos a autorização com brevidade para emissão do CT-e e liberação do embarque.
+
+Desde já, agradecemos pela atenção e agilidade!
 
 Atenciosamente,
-${nome}
+${name}
+
+🚚💨📦`;
+
+    const textoSemEmojis = `${getGreeting()}, tudo bem?
+Por gentileza, confirmar o recebimento desta mensagem.
+
+Solicitamos a Autorização para Embarque do frete abaixo:
+
+Dados do Frete:
+
+Número da NF: ${nfNumber}
+
+Número da Cotação: ${quotationNumber}
+
+Valor do Frete: R$ ${freightValue}
+
+Transportadora: ${carrier}
+
+Observação Importante:
+A mercadoria só será embarcada mediante autorização da empresa contratante.
+
+Urgência:
+Solicitamos a autorização com brevidade para emissão do CT-e e liberação do embarque.
+
+Desde já, agradecemos pela atenção e agilidade!
+
+Atenciosamente,
+${name}
 `;
 
     const handleCopy = () => {
@@ -85,7 +80,7 @@ ${nome}
             alert('Digite o email de destino.');
             return;
         }
-        const subject = encodeURIComponent('Termo de isenção ------ URGENTE!!!!!!');
+        const subject = encodeURIComponent('Solicitação de Autorização para Embarque');
         const body = encodeURIComponent(textoComEmojis);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
@@ -108,10 +103,12 @@ ${nome}
 
     return (
         <div className="container mt-5">
-            <h2 className="text-white">Solicitação de Termo de Isenção de Avaria</h2>
-            <form className="bg-dark p-4 rounded">
+            <h2 className="text-white">Autorização de Embarque</h2>
+            <form className="bg-dark p-4 rounded" onSubmit={e => e.preventDefault()}>
                 <div className="mb-3">
-                    <label className="form-label text-white">Número da Nota Fiscal:</label>
+                    <label className="form-label text-white">
+                        Número da Nota Fiscal:
+                    </label>
                     <input
                         type="text"
                         className="form-control"
@@ -121,27 +118,51 @@ ${nome}
                     />
                 </div>
                 <div className="mb-3">
-                    <label className="form-label text-white">Transportadora:</label>
-                    <select
-                        className="form-select"
-                        value={transportadora}
-                        onChange={(e) => setTransportadora(e.target.value)}
-                    >
-                        {transportadoras.map(t => (
-                            <option key={t.nome} value={t.nome}>
-                                {t.nome}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label text-white">Seu nome:</label>
+                    <label className="form-label text-white">
+                        Número da Cotação:
+                    </label>
                     <input
                         type="text"
                         className="form-control"
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        placeholder="Digite seu nome"
+                        value={quotationNumber}
+                        onChange={(e) => setQuotationNumber(e.target.value)}
+                        placeholder="Digite o número da cotação"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label text-white">
+                        Valor do Frete:
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={freightValue}
+                        onChange={(e) => setFreightValue(e.target.value)}
+                        placeholder="Digite o valor do frete"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label text-white">
+                        Transportadora:
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={carrier}
+                        onChange={(e) => setCarrier(e.target.value)}
+                        placeholder="Digite o nome da transportadora"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label text-white">
+                        Nome:
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Seu nome"
                     />
                 </div>
                 <button
@@ -149,9 +170,8 @@ ${nome}
                     className="btn btn-light me-2"
                     onClick={handleCopy}
                 >
-                    Copiar Solicitação
+                    Copiar Texto
                 </button>
-                {/* Campo de email e botão Gmail */}
                 <div className="mb-3 mt-3">
                     <label className="form-label text-white">
                         Email para envio:
@@ -171,7 +191,6 @@ ${nome}
                         Enviar pelo Gmail
                     </button>
                 </div>
-                {/* Campo e botão WhatsApp */}
                 <div className="mb-3">
                     <label className="form-label text-white">
                         WhatsApp para envio:
@@ -202,4 +221,4 @@ ${nome}
     );
 };
 
-export default TermoIsencaoAvariaForm;
+export default AutorizacaoEmbarqueForm;
