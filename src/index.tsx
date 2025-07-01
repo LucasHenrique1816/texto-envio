@@ -12,3 +12,4 @@ root.render(
 
 // Ative o service worker para PWA
 serviceWorkerRegistration.register();
+

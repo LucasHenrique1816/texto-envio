@@ -8,11 +8,13 @@ import TranspixCadastralForm from './components/TranspixCadastralForm';
 import TranscomprasCadastralForm from './components/TranscomprasCadastralForm';
 import TrackingForm from './components/TrackingForm';
 import CorrectionLetterForm from './components/CorrectionLetterForm';
+import FilialContatoForm from './components/FilialContatoForm';
+import TermoIsencaoAvariaForm from './components/TermoIsencaoAvariaForm';
 import logo from './assets/logofinal.png';
 
 const App: React.FC = () => {
     const [screen, setScreen] = useState<
-        'setor' | 'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking' | 'correctionLetter' | 'bankData' | 'cadastralData'
+        'setor' | 'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking' | 'correctionLetter' | 'bankData' | 'cadastralData' | 'contatoFilial' | 'termoIsencao'
     >('setor');
     const [setor, setSetor] = useState<'comercial' | 'pendencia' | null>(null);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -89,7 +91,9 @@ const App: React.FC = () => {
     }
 
     // Home com botões de cada setor
-    if (screen === 'home') {
+    if (screen === 'home') { 
+        
+        console.log('setor:', setor, 'screen:', screen);
         return (
             <div className="container mt-5 text-center">
                 {renderLogoAndInstall()}
@@ -136,6 +140,12 @@ const App: React.FC = () => {
                         >
                             📄 Texto para rastreio de NF
                         </button>
+                        <button
+                            className="btn btn-outline-success m-2"
+                            onClick={() => setScreen('contatoFilial')}
+                        >
+                            📞 Texto para contato de filial
+                        </button>
                     </>
                 )}
                 {/* Opções para o setor Pendência */}
@@ -158,6 +168,18 @@ const App: React.FC = () => {
                             onClick={() => setScreen('cadastralData')}
                         >
                             📦 Texto para dados cadastrais
+                        </button>
+                        <button
+                            className="btn btn-outline-success m-2"
+                            onClick={() => setScreen('contatoFilial')}
+                        >
+                            📞 Texto para contato de filial
+                        </button>
+                        <button
+                            className="btn btn-outline-danger m-2"
+                            onClick={() => setScreen('termoIsencao')}
+                        >
+                            📝 Solicitação de Termo de Isenção de Avaria
                         </button>
                     </>
                 )}
@@ -221,6 +243,26 @@ const App: React.FC = () => {
         );
     }
 
+    // Tela para contato de filial
+    if (screen === 'contatoFilial') {
+        return (
+            <div className="container mt-5 text-center">
+                {renderLogoAndInstall()}
+                <button
+                    className="btn btn-outline-success mb-3"
+                    onClick={() => setScreen('home')}
+                >
+                    &larr; Voltar
+                </button>
+                <div className="d-flex justify-content-center">
+                    <div style={{ width: "100%", maxWidth: 600 }}>
+                        <FilialContatoForm />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     // Demais telas: sempre exibe logo, botão voltar e o formulário correspondente
     const renderScreenWithLogo = (FormComponent: React.FC, backTo: 'home' | 'bankData' | 'cadastralData', backBtnClass = "btn btn-secondary") => (
         <div className="container mt-5 text-center">
@@ -247,6 +289,7 @@ const App: React.FC = () => {
     if (screen === 'transcomprasCadastral') return renderScreenWithLogo(TranscomprasCadastralForm, 'cadastralData', "btn btn-danger");
     if (screen === 'tracking') return renderScreenWithLogo(TrackingForm, 'home', "btn btn-dark");
     if (screen === 'correctionLetter') return renderScreenWithLogo(CorrectionLetterForm, 'home', "btn btn-outline-warning");
+    if (screen === 'termoIsencao') return renderScreenWithLogo(TermoIsencaoAvariaForm, 'home', "btn btn-outline-danger");
 
     return null;
 };
