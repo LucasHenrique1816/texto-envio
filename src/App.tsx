@@ -54,6 +54,7 @@ const App: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>('');
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [showInstall, setShowInstall] = useState(false);
+    const [formKey, setFormKey] = useState<number>(0); // Para forçar remount do formulário
 
     useEffect(() => {
         const handler = (e: any) => {
@@ -166,7 +167,10 @@ const App: React.FC = () => {
                                         border: '1px solid #444',
                                         borderBottom: activeTab === tab.key ? 'none' : undefined,
                                     }}
-                                    onClick={() => setActiveTab(tab.key)}
+                                    onClick={() => {
+                                        setActiveTab(tab.key);
+                                        setFormKey(prev => prev + 1); // Limpa formulário ao trocar de aba
+                                    }}
                                 >
                                     {tab.label}
                                 </button>
@@ -174,7 +178,19 @@ const App: React.FC = () => {
                         ))}
                     </ul>
                     <div className="bg-dark rounded p-3 shadow">
-                        {ActiveComponent ? <ActiveComponent /> : (
+                        {ActiveComponent ? (
+                            <>
+                                <ActiveComponent key={formKey + activeTab} />
+                                <div className="d-flex justify-content-end mt-3">
+                                    <button
+                                        className="btn btn-outline-warning"
+                                        onClick={() => setFormKey(prev => prev + 1)}
+                                    >
+                                        Limpar formulário
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
                             <div className="text-center text-white">
                                 <h4>Selecione uma aba acima para começar.</h4>
                             </div>
