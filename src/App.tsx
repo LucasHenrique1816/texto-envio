@@ -13,11 +13,45 @@ import TermoIsencaoAvariaForm from './components/TermoIsencaoAvariaForm';
 import AutorizacaoEmbarqueForm from './components/AutorizacaoEmbarqueForm';
 import logo from './assets/logofinal.png';
 
+type Screen =
+    | 'setor'
+    | 'home'
+    | 'quotation'
+    | 'collection'
+    | 'transpix'
+    | 'transcompras'
+    | 'transpixCadastral'
+    | 'transcomprasCadastral'
+    | 'tracking'
+    | 'correctionLetter'
+    | 'contatoFilial'
+    | 'termoIsencao'
+    | 'autorizacaoEmbarque';
+
+const comercialTabs = [
+    { key: 'quotation', label: '📝 Cotação', component: QuotationForm },
+    { key: 'collection', label: '🚚 Coleta', component: CollectionForm },
+    { key: 'tracking', label: '📄 Rastreio NF', component: TrackingForm },
+    { key: 'contatoFilial', label: '📞 Contato Filial', component: FilialContatoForm },
+    { key: 'transpixCadastral', label: '📦 Cadastral Transpix', component: TranspixCadastralForm },
+    { key: 'transcomprasCadastral', label: '📦 Cadastral Transcompras', component: TranscomprasCadastralForm },
+];
+
+const pendenciaTabs = [
+    { key: 'correctionLetter', label: '✉️ Carta de Correção', component: CorrectionLetterForm },
+    { key: 'transpix', label: '💰 Bancários Transpix', component: TranspixForm },
+    { key: 'transcompras', label: '💰 Bancários Transcompras', component: TranscomprasForm },
+    { key: 'transpixCadastral', label: '📦 Cadastral Transpix', component: TranspixCadastralForm },
+    { key: 'transcomprasCadastral', label: '📦 Cadastral Transcompras', component: TranscomprasCadastralForm },
+    { key: 'tracking', label: '📄 Rastreio NF', component: TrackingForm },
+    { key: 'termoIsencao', label: '📝 Termo de Isenção', component: TermoIsencaoAvariaForm },
+    { key: 'autorizacaoEmbarque', label: '🚚 Autorização Embarque', component: AutorizacaoEmbarqueForm },
+];
+
 const App: React.FC = () => {
-    const [screen, setScreen] = useState<
-        'setor' | 'home' | 'quotation' | 'collection' | 'transpix' | 'transcompras' | 'transpixCadastral' | 'transcomprasCadastral' | 'tracking' | 'correctionLetter' | 'bankData' | 'cadastralData' | 'contatoFilial' | 'termoIsencao' | 'autorizacaoEmbarque'
-    >('setor');
+    const [screen, setScreen] = useState<Screen>('setor');
     const [setor, setSetor] = useState<'comercial' | 'pendencia' | null>(null);
+    const [activeTab, setActiveTab] = useState<string>('');
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [showInstall, setShowInstall] = useState(false);
 
@@ -42,7 +76,7 @@ const App: React.FC = () => {
         }
     };
 
-    // Sempre exibe a logo e o botão de instalar app
+    // Logo e botão instalar
     const renderLogoAndInstall = () => (
         <>
             <img
@@ -63,7 +97,7 @@ const App: React.FC = () => {
         </>
     );
 
-    // Tela de seleção de setor
+    // Seleção de setor
     if (screen === 'setor') {
         return (
             <div className="container mt-5 text-center">
@@ -74,6 +108,7 @@ const App: React.FC = () => {
                     onClick={() => {
                         setSetor('comercial');
                         setScreen('home');
+                        setActiveTab('quotation');
                     }}
                 >
                     Comercial
@@ -83,6 +118,7 @@ const App: React.FC = () => {
                     onClick={() => {
                         setSetor('pendencia');
                         setScreen('home');
+                        setActiveTab('correctionLetter');
                     }}
                 >
                     Pendência
@@ -91,213 +127,66 @@ const App: React.FC = () => {
         );
     }
 
-    // Home com botões de cada setor
-    if (screen === 'home') { 
-        
-        console.log('setor:', setor, 'screen:', screen);
-        return (
-            <div className="container mt-5 text-center">
-                {renderLogoAndInstall()}
-                <h2 className="mb-4">
-                    {setor === 'comercial'
-                        ? 'Setor Comercial'
-                        : setor === 'pendencia'
-                        ? 'Setor Pendência'
-                        : ''}
-                </h2>
-                <button
-                    className="btn btn-outline-secondary mb-4"
-                    onClick={() => {
-                        setSetor(null);
-                        setScreen('setor');
-                    }}
-                >
-                    &larr; Trocar setor
-                </button>
-                {/* Opções para o setor Comercial */}
-                {setor === 'comercial' && (
-                    <>
-                        <button
-                            className="btn btn-primary m-2"
-                            onClick={() => setScreen('quotation')}
-                        >
-                            📝 Texto para envio de cotação
-                        </button>
-                        <button
-                            className="btn btn-secondary m-2"
-                            onClick={() => setScreen('collection')}
-                        >
-                            🚚 Texto para envio de coleta
-                        </button>
-                        <button
-                            className="btn btn-info m-2"
-                            onClick={() => setScreen('cadastralData')}
-                        >
-                            📦 Texto para dados cadastrais
-                        </button>
-                        <button
-                            className="btn btn-outline-primary m-2"
-                            onClick={() => setScreen('tracking')}
-                        >
-                            📄 Texto para rastreio de NF
-                        </button>
-                        <button
-                            className="btn btn-outline-success m-2"
-                            onClick={() => setScreen('contatoFilial')}
-                        >
-                            📞 Texto para contato de filial
-                        </button>
-                    </>
-                )}
-                {/* Opções para o setor Pendência */}
-                {setor === 'pendencia' && (
-                    <>
-                        <button
-                            className="btn btn-outline-warning m-2"
-                            onClick={() => setScreen('correctionLetter')}
-                        >
-                            ✉️ Solicitação de Carta de Correção
-                        </button>
-                        <button
-                            className="btn btn-success m-2"
-                            onClick={() => setScreen('bankData')}
-                        >
-                            💰 Texto para dados bancários
-                        </button>
-                        <button
-                            className="btn btn-info m-2"
-                            onClick={() => setScreen('cadastralData')}
-                        >
-                            📦 Texto para dados cadastrais
-                        </button>
-                        <button
-                            className="btn btn-outline-success m-2"
-                            onClick={() => setScreen('contatoFilial')}
-                        >
-                            📞 Texto para contato de filial
-                        </button>
-                        <button
-                            className="btn btn-outline-danger m-2"
-                            onClick={() => setScreen('termoIsencao')}
-                        >
-                            📝 Solicitação de Termo de Isenção de Avaria
-                        </button>
-                        <button
-                            className="btn btn-outline-primary m-2"
-                            onClick={() => setScreen('autorizacaoEmbarque')}
-                        >
-                            🚚 Solicitação de Autorização de Embarque
-                        </button>
-                    </>
-                )}
-            </div>
-        );
-    }
+    // Após selecionar setor, exibe barra de navegação e abas
+    if (screen === 'home' && setor) {
+        const tabs = setor === 'comercial' ? comercialTabs : pendenciaTabs;
+        const ActiveComponent = tabs.find(tab => tab.key === activeTab)?.component;
 
-    // Tela para seleção de dados bancários
-    if (screen === 'bankData') {
         return (
-            <div className="container mt-5 text-center">
-                {renderLogoAndInstall()}
-                <button
-                    className="btn btn-secondary mb-3"
-                    onClick={() => setScreen('home')}
-                >
-                    &larr; Voltar
-                </button>
-                <h3 className="mb-4">Escolha o texto de dados bancários</h3>
-                <button
-                    className="btn btn-success m-2"
-                    onClick={() => setScreen('transpix')}
-                >
-                    💰 Texto para dados bancários Transpix
-                </button>
-                <button
-                    className="btn btn-warning m-2"
-                    onClick={() => setScreen('transcompras')}
-                >
-                    💰 Texto para dados bancários Transcompras
-                </button>
-            </div>
-        );
-    }
-
-    // Tela para seleção de dados cadastrais
-    if (screen === 'cadastralData') {
-        return (
-            <div className="container mt-5 text-center">
-                {renderLogoAndInstall()}
-                <button
-                    className="btn btn-secondary mb-3"
-                    onClick={() => setScreen('home')}
-                >
-                    &larr; Voltar
-                </button>
-                <h3 className="mb-4">Escolha o texto de dados cadastrais</h3>
-                <button
-                    className="btn btn-info m-2"
-                    onClick={() => setScreen('transpixCadastral')}
-                >
-                    📦 Dados cadastrais Transpix
-                </button>
-                <button
-                    className="btn btn-danger m-2"
-                    onClick={() => setScreen('transcomprasCadastral')}
-                >
-                    📦 Dados cadastrais Transcompras
-                </button>
-            </div>
-        );
-    }
-
-    // Tela para contato de filial
-    if (screen === 'contatoFilial') {
-        return (
-            <div className="container mt-5 text-center">
-                {renderLogoAndInstall()}
-                <button
-                    className="btn btn-outline-success mb-3"
-                    onClick={() => setScreen('home')}
-                >
-                    &larr; Voltar
-                </button>
-                <div className="d-flex justify-content-center">
-                    <div style={{ width: "100%", maxWidth: 600 }}>
-                        <FilialContatoForm />
+            <div className="min-vh-100" style={{ background: '#18191a' }}>
+                <nav className="navbar navbar-expand-lg navbar-dark" style={{ background: '#23272b', borderBottom: '1px solid #222' }}>
+                    <div className="container-fluid">
+                        <span className="navbar-brand d-flex align-items-center">
+                            <img src={logo} alt="Logo" style={{ height: 40, marginRight: 12 }} />
+                            <span>
+                                {setor === 'comercial' ? 'Setor Comercial' : 'Setor Pendência'}
+                            </span>
+                        </span>
+                        <button
+                            className="btn btn-outline-light"
+                            onClick={() => {
+                                setSetor(null);
+                                setScreen('setor');
+                                setActiveTab('');
+                            }}
+                        >
+                            Trocar setor
+                        </button>
+                    </div>
+                </nav>
+                <div className="container py-4">
+                    <ul className="nav nav-tabs mb-4" style={{ borderColor: '#444' }}>
+                        {tabs.map(tab => (
+                            <li className="nav-item" key={tab.key}>
+                                <button
+                                    className={`nav-link ${activeTab === tab.key ? 'active' : ''}`}
+                                    style={{
+                                        background: activeTab === tab.key ? '#23272b' : '#18191a',
+                                        color: '#fff',
+                                        border: '1px solid #444',
+                                        borderBottom: activeTab === tab.key ? 'none' : undefined,
+                                    }}
+                                    onClick={() => setActiveTab(tab.key)}
+                                >
+                                    {tab.label}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="bg-dark rounded p-3 shadow">
+                        {ActiveComponent ? <ActiveComponent /> : (
+                            <div className="text-center text-white">
+                                <h4>Selecione uma aba acima para começar.</h4>
+                            </div>
+                        )}
                     </div>
                 </div>
+                <footer className="text-center text-secondary py-3" style={{ background: '#23272b', borderTop: '1px solid #222' }}>
+                    <small>Transcompras & Transpix &copy; {new Date().getFullYear()}</small>
+                </footer>
             </div>
         );
     }
-
-    // Demais telas: sempre exibe logo, botão voltar e o formulário correspondente
-    const renderScreenWithLogo = (FormComponent: React.FC, backTo: 'home' | 'bankData' | 'cadastralData', backBtnClass = "btn btn-secondary") => (
-        <div className="container mt-5 text-center">
-            {renderLogoAndInstall()}
-            <button
-                className={`${backBtnClass} mb-3`}
-                onClick={() => setScreen(backTo)}
-            >
-                &larr; Voltar
-            </button>
-            <div className="d-flex justify-content-center">
-                <div style={{ width: "100%", maxWidth: 600 }}>
-                    <FormComponent />
-                </div>
-            </div>
-        </div>
-    );
-
-    if (screen === 'quotation') return renderScreenWithLogo(QuotationForm, 'home', "btn btn-primary");
-    if (screen === 'collection') return renderScreenWithLogo(CollectionForm, 'home', "btn btn-secondary");
-    if (screen === 'transpix') return renderScreenWithLogo(TranspixForm, 'bankData', "btn btn-success");
-    if (screen === 'transcompras') return renderScreenWithLogo(TranscomprasForm, 'bankData', "btn btn-warning");
-    if (screen === 'transpixCadastral') return renderScreenWithLogo(TranspixCadastralForm, 'cadastralData', "btn btn-info");
-    if (screen === 'transcomprasCadastral') return renderScreenWithLogo(TranscomprasCadastralForm, 'cadastralData', "btn btn-danger");
-    if (screen === 'tracking') return renderScreenWithLogo(TrackingForm, 'home', "btn btn-dark");
-    if (screen === 'correctionLetter') return renderScreenWithLogo(CorrectionLetterForm, 'home', "btn btn-outline-warning");
-    if (screen === 'termoIsencao') return renderScreenWithLogo(TermoIsencaoAvariaForm, 'home', "btn btn-outline-danger");
-    if (screen === 'autorizacaoEmbarque') return renderScreenWithLogo(AutorizacaoEmbarqueForm, 'home', "btn btn-outline-primary");
 
     return null;
 };
