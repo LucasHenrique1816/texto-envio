@@ -124,30 +124,49 @@ const getGreeting = () => {
     return hour < 12 ? 'Bom dia' : 'Boa tarde';
 };
 
+const onlyNumbers = (value: string) => value.replace(/\D/g, '');
+const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const FilialContatoForm: React.FC = () => {
-    const [filialSelecionada, setFilialSelecionada] = useState(filiais[0].nome);
+    const [filialSelecionada, setFilialSelecionada] = useState<string | null>(null);
     const [email, setEmail] = useState('');
     const [whatsNumber, setWhatsNumber] = useState('');
+    const [showModal, setShowModal] = useState<null | 'copy' | 'gmail' | 'whats'>(null);
 
     const greeting = getGreeting();
 
     const filial = filiais.find(f => f.nome === filialSelecionada);
-    const textoFilial = `${greeting},\n\n${filial?.texto || ''}`;
-    const textoFilialWhats = `${greeting},\n\n${filial?.textoSemEmojis || ''}`;
+    const textoFilial = filial ? `${greeting},\n\n${filial.texto}` : '';
+    const textoFilialWhats = filial ? `${greeting},\n\n${filial.textoSemEmojis}` : '';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFilialSelecionada(e.target.value);
     };
 
+    const handleClear = () => {
+        setFilialSelecionada(null);
+        setEmail('');
+        setWhatsNumber('');
+        setShowModal(null);
+    };
+
+    const isCopyValid = !!filialSelecionada;
+    const isEmailValid = isCopyValid && validateEmail(email);
+    const isWhatsValid = isCopyValid && whatsNumber.length >= 10;
+    const isAnyFieldFilled = filialSelecionada || email || whatsNumber;
+
     const handleCopy = () => {
+        if (!filialSelecionada) return;
         navigator.clipboard.writeText(textoFilial).then(() => {
             alert('Texto copiado para a área de transferência!');
         });
+        setShowModal(null);
     };
 
     const handleSendGmail = () => {
-        if (!email) {
-            alert('Digite o email de destino.');
+        if (!validateEmail(email)) {
+            alert('Digite um email válido.');
             return;
         }
         const subject = encodeURIComponent(`Contato Filial ${filialSelecionada}`);
@@ -156,11 +175,12 @@ const FilialContatoForm: React.FC = () => {
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
             '_blank'
         );
+        setShowModal(null);
     };
 
     const handleSendWhatsApp = () => {
-        if (!whatsNumber) {
-            alert('Digite o número do WhatsApp.');
+        if (whatsNumber.length < 10) {
+            alert('Digite um número de WhatsApp válido.');
             return;
         }
         let number = whatsNumber.replace(/\D/g, '');
@@ -169,12 +189,18 @@ const FilialContatoForm: React.FC = () => {
         }
         const text = encodeURIComponent(textoFilialWhats);
         window.open(`https://wa.me/${number}?text=${text}`, '_blank');
+        setShowModal(null);
     };
 
     return (
         <div className="container mt-5">
             <h2 className="text-white">Texto para Dados de Contato das Filiais</h2>
-            <form className="bg-dark p-4 rounded">
+            {isAnyFieldFilled && (
+                <button className="btn btn-warning mb-3" type="button" onClick={handleClear}>
+                    Limpar formulário
+                </button>
+            )}
+            <form className="bg-dark p-4 rounded" onSubmit={e => e.preventDefault()}>
                 <div className="mb-3">
                     <label className="form-label text-white">Selecione a filial:</label>
                     <div className="d-flex flex-wrap">
@@ -196,49 +222,28 @@ const FilialContatoForm: React.FC = () => {
                         ))}
                     </div>
                 </div>
-                <button
-                    type="button"
-                    className="btn btn-light me-2"
-                    onClick={handleCopy}
-                >
-                    Copiar Dados de Contato
-                </button>
-                {/* Campo de email e botão Gmail */}
-                <div className="mb-3 mt-3">
-                    <label className="form-label text-white">
-                        Email para envio:
-                    </label>
-                    <input
-                        type="email"
-                        className="form-control mb-2"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="destinatario@exemplo.com"
-                    />
+                <div className="mb-3 d-flex gap-2">
                     <button
                         type="button"
-                        className="btn btn-danger me-2"
-                        onClick={handleSendGmail}
+                        className="btn btn-light"
+                        onClick={() => setShowModal('copy')}
+                        disabled={!isCopyValid}
+                    >
+                        Copiar Dados de Contato
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => setShowModal('gmail')}
+                        disabled={!isCopyValid}
                     >
                         Enviar pelo Gmail
                     </button>
-                </div>
-                {/* Campo e botão WhatsApp */}
-                <div className="mb-3">
-                    <label className="form-label text-white">
-                        WhatsApp para envio:
-                    </label>
-                    <input
-                        type="tel"
-                        className="form-control mb-2"
-                        value={whatsNumber}
-                        onChange={(e) => setWhatsNumber(e.target.value)}
-                        placeholder="Ex: 11999999999"
-                    />
                     <button
                         type="button"
                         className="btn btn-success"
-                        onClick={handleSendWhatsApp}
+                        onClick={() => setShowModal('whats')}
+                        disabled={!isCopyValid}
                     >
                         Enviar pelo WhatsApp
                     </button>
@@ -250,6 +255,105 @@ const FilialContatoForm: React.FC = () => {
                     </pre>
                 </div>
             </form>
+
+            {/* Modal de confirmação */}
+            {showModal && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        background: 'rgba(0,0,0,0.7)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <form className="bg-dark p-4 rounded" style={{ maxWidth: 600, width: '90%' }} onSubmit={e => e.preventDefault()}>
+                        <div className="mb-3 text-center">
+                            <span style={{ fontSize: 22 }}>⚠️</span>
+                            <span className="text-warning fw-bold mx-2" style={{ fontSize: 18 }}>
+                                Confirme as informações antes de enviar
+                            </span>
+                            <span style={{ fontSize: 22 }}>⚠️</span>
+                        </div>
+                        <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflowY: 'auto' }}>
+                            {textoFilial}
+                        </pre>
+                        {showModal === 'gmail' && (
+                            <div className="mb-3">
+                                <label className="form-label text-white">
+                                    Email para envio:
+                                </label>
+                                <input
+                                    type="email"
+                                    className="form-control mb-2"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value.replace(/[^a-zA-Z0-9@._-]/g, ''))}
+                                    placeholder="destinatario@exemplo.com"
+                                    autoComplete="email"
+                                    required
+                                />
+                            </div>
+                        )}
+                        {showModal === 'whats' && (
+                            <div className="mb-3">
+                                <label className="form-label text-white">
+                                    WhatsApp para envio:
+                                </label>
+                                <input
+                                    type="tel"
+                                    className="form-control mb-2"
+                                    value={whatsNumber}
+                                    onChange={(e) => setWhatsNumber(onlyNumbers(e.target.value))}
+                                    placeholder="Ex: 11999999999"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    maxLength={13}
+                                    required
+                                />
+                            </div>
+                        )}
+                        <div className="d-flex justify-content-end gap-2 mt-3">
+                            <button
+                                className="btn btn-secondary"
+                                type="button"
+                                onClick={() => setShowModal(null)}
+                            >
+                                Alterar dados
+                            </button>
+                            {showModal === 'copy' && (
+                                <button className="btn btn-light" type="button" onClick={handleCopy}>
+                                    Confirmar e Copiar
+                                </button>
+                            )}
+                            {showModal === 'gmail' && (
+                                <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={handleSendGmail}
+                                    disabled={!validateEmail(email)}
+                                >
+                                    Confirmar e Enviar Gmail
+                                </button>
+                            )}
+                            {showModal === 'whats' && (
+                                <button
+                                    className="btn btn-success"
+                                    type="button"
+                                    onClick={handleSendWhatsApp}
+                                    disabled={whatsNumber.length < 10}
+                                >
+                                    Confirmar e Enviar WhatsApp
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
+            )}
         </div>
     );
 };

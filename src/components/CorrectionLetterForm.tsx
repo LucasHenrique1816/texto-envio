@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 
+const onlyNumbers = (value: string) => value.replace(/\D/g, '');
+const onlyLetters = (value: string) => value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const dadosTranspix = `Dados da Transportadora:
 
 Razão Social: TRANSPIX - Transportes e Logística LTDA
@@ -139,6 +144,38 @@ ${carrier}
 
 🚚💨📦`;
 
+    // Limpar formulário
+    const handleClear = () => {
+        setNfNumber('');
+        setCorrecao('');
+        setName('');
+        setCarrier('Transpix');
+        setEmail('');
+        setWhatsNumber('');
+        setAddTranspix(false);
+        setAddTranscompras(false);
+    };
+
+    // Validação dos campos obrigatórios
+    const isCopyValid =
+        nfNumber.trim() &&
+        correcao.trim() &&
+        name.trim();
+
+    const isEmailValid = isCopyValid && validateEmail(email);
+    const isWhatsValid = isCopyValid && whatsNumber.length >= 10;
+
+    // Verifica se algum campo foi preenchido para mostrar o botão de limpar
+    const isAnyFieldFilled =
+        nfNumber ||
+        correcao ||
+        name ||
+        email ||
+        whatsNumber ||
+        addTranspix ||
+        addTranscompras;
+
+    // Funções de envio
     const handleCopy = () => {
         navigator.clipboard.writeText(cartaTextoPreview).then(() => {
             alert('Texto copiado para a área de transferência!');
@@ -146,12 +183,11 @@ ${carrier}
     };
 
     const handleSendGmail = () => {
-        if (!email) {
-            alert('Digite o email de destino.');
+        if (!validateEmail(email)) {
+            alert('Digite um email válido.');
             return;
         }
         const subject = encodeURIComponent('Solicitação de Carta de Correção');
-        // Usa o corpo em texto simples, mas com Markdown para negrito
         const body = encodeURIComponent(cartaTextoEmail);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
@@ -160,8 +196,8 @@ ${carrier}
     };
 
     const handleSendWhatsApp = () => {
-        if (!whatsNumber) {
-            alert('Digite o número do WhatsApp.');
+        if (whatsNumber.length < 10) {
+            alert('Digite um número de WhatsApp válido.');
             return;
         }
         let number = whatsNumber.replace(/\D/g, '');
@@ -175,6 +211,11 @@ ${carrier}
     return (
         <div className="container mt-5">
             <h2 className="text-white">Solicitação de Carta de Correção</h2>
+            {isAnyFieldFilled && (
+                <button className="btn btn-warning mb-3" type="button" onClick={handleClear}>
+                    Limpar formulário
+                </button>
+            )}
             <form className="bg-dark p-4 rounded">
                 <div className="mb-3">
                     <label className="form-label text-white">Número da NF:</label>
@@ -182,8 +223,10 @@ ${carrier}
                         type="text"
                         className="form-control"
                         value={nfNumber}
-                        onChange={(e) => setNfNumber(e.target.value)}
+                        onChange={(e) => setNfNumber(onlyNumbers(e.target.value))}
                         placeholder="Digite o número da NF"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                     />
                 </div>
                 <div className="mb-3">
@@ -228,7 +271,7 @@ ${carrier}
                         type="text"
                         className="form-control"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => setName(onlyLetters(e.target.value))}
                         placeholder="Seu nome"
                     />
                 </div>
@@ -243,49 +286,28 @@ ${carrier}
                         <option value="Transcompras Transportes e Compras Comerciais LTDA">Transcompras</option>
                     </select>
                 </div>
-                <button
-                    type="button"
-                    className="btn btn-light me-2"
-                    onClick={handleCopy}
-                >
-                    Copiar Solicitação
-                </button>
-                {/* Campo de email e botão Gmail abaixo do botão copiar */}
-                <div className="mb-3 mt-3">
-                    <label className="form-label text-white">
-                        Email para envio:
-                    </label>
-                    <input
-                        type="email"
-                        className="form-control mb-2"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="destinatario@exemplo.com"
-                    />
+                <div className="mb-3 d-flex gap-2">
                     <button
                         type="button"
-                        className="btn btn-danger me-2"
+                        className="btn btn-light"
+                        onClick={handleCopy}
+                        disabled={!isCopyValid}
+                    >
+                        Copiar Solicitação
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger"
                         onClick={handleSendGmail}
+                        disabled={!isCopyValid}
                     >
                         Enviar Solicitação pelo Gmail
                     </button>
-                </div>
-                {/* Campo e botão WhatsApp */}
-                <div className="mb-3">
-                    <label className="form-label text-white">
-                        WhatsApp para envio:
-                    </label>
-                    <input
-                        type="tel"
-                        className="form-control mb-2"
-                        value={whatsNumber}
-                        onChange={(e) => setWhatsNumber(e.target.value)}
-                        placeholder="Ex: 11999999999"
-                    />
                     <button
                         type="button"
                         className="btn btn-success"
                         onClick={handleSendWhatsApp}
+                        disabled={!isCopyValid}
                     >
                         Enviar Solicitação pelo WhatsApp
                     </button>
