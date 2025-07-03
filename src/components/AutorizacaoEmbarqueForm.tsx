@@ -27,6 +27,14 @@ function formatCurrency(value: string) {
     return v;
 }
 
+interface ExtraFrete {
+    quotationNumber: string;
+    nfNumber: string;
+    value: string;
+    freightPayer: string;
+    freightType?: 'avista' | 'faturado';
+}
+
 const AutorizacaoEmbarqueForm: React.FC = () => {
     const [nfNumber, setNfNumber] = useState('');
     const [quotationNumber, setQuotationNumber] = useState('');
@@ -37,10 +45,9 @@ const AutorizacaoEmbarqueForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [whatsNumber, setWhatsNumber] = useState('');
     const [addMore, setAddMore] = useState(false);
-    const [extraFretes, setExtraFretes] = useState<
-        { quotationNumber: string; nfNumber: string; value: string; freightPayer: string }[]
-    >([]);
+    const [extraFretes, setExtraFretes] = useState<ExtraFrete[]>([]);
     const [showModal, setShowModal] = useState<null | 'copy' | 'gmail' | 'whats'>(null);
+    const [freightType, setFreightType] = useState<'avista' | 'faturado' | ''>('');
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -58,18 +65,37 @@ const AutorizacaoEmbarqueForm: React.FC = () => {
 Número da Cotação: ${quotationNumber}
 Valor do Frete: R$ ${freightValue}
 Pagador do Frete: ${freightPayer}
-Transportadora: ${carrier ? `${transportadoras.find(t => t.nome === carrier)?.razao} (${transportadoras.find(t => t.nome === carrier)?.cnpj})` : ''}`,
+Tipo de Frete: ${freightType === 'avista' ? 'À vista' : freightType === 'faturado' ? 'Faturado' : ''}
+Transportadora: ${
+            carrier
+                ? `${transportadoras.find(t => t.nome === carrier)?.razao} (${transportadoras.find(t => t.nome === carrier)?.cnpj})`
+                : ''
+        }`,
         ...extraFretes.map(
             (f, i) =>
                 `Número da NF: ${f.nfNumber}
 Número da Cotação: ${f.quotationNumber}
 Valor do Frete: R$ ${f.value}
 Pagador do Frete: ${f.freightPayer}
-Transportadora: ${carrier ? `${transportadoras.find(t => t.nome === carrier)?.razao} (${transportadoras.find(t => t.nome === carrier)?.cnpj})` : ''}`
+Tipo de Frete: ${
+                    f.freightType === 'avista'
+                        ? 'À vista'
+                        : f.freightType === 'faturado'
+                        ? 'Faturado'
+                        : ''
+                }
+Transportadora: ${
+                    carrier
+                        ? `${transportadoras.find(t => t.nome === carrier)?.razao} (${transportadoras.find(t => t.nome === carrier)?.cnpj})`
+                        : ''
+                }`
         ),
     ].join('\n\n');
 
-    const valorTotalTexto = `Valor total do frete: R$ ${totalFrete.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const valorTotalTexto = `Valor total do frete: R$ ${totalFrete.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
 
     const textoComEmojis = `${getGreeting()}, tudo bem? 📩
 ✉️ Por gentileza, confirmar o recebimento desta mensagem.
@@ -130,15 +156,27 @@ ${name}
         setWhatsNumber('');
         setAddMore(false);
         setExtraFretes([]);
+        setFreightType('');
         setShowModal(null);
     };
 
     // Funções de envio
-    const isCopyValid = nfNumber && quotationNumber && freightValue && freightPayer && carrier && name;
+    const isCopyValid =
+        nfNumber && quotationNumber && freightValue && freightPayer && carrier && name && freightType;
+
     const isEmailValid = isCopyValid && validateEmail(email);
     const isWhatsValid = isCopyValid && whatsNumber.length >= 10;
     const isAnyFieldFilled =
-        nfNumber || quotationNumber || freightValue || freightPayer || carrier || name || email || whatsNumber || extraFretes.length > 0;
+        nfNumber ||
+        quotationNumber ||
+        freightValue ||
+        freightPayer ||
+        carrier ||
+        name ||
+        email ||
+        whatsNumber ||
+        extraFretes.length > 0 ||
+        freightType;
 
     const handleCopy = () => {
         if (!isCopyValid) return;
@@ -180,11 +218,11 @@ ${name}
     const handleAddFrete = () => {
         setExtraFretes([
             ...extraFretes,
-            { quotationNumber: '', nfNumber: '', value: '', freightPayer: '' },
+            { quotationNumber: '', nfNumber: '', value: '', freightPayer: '', freightType: undefined },
         ]);
     };
 
-    // Atualiza um frete extra
+    // Atualiza um frete extra (campos comuns)
     const handleChangeFrete = (
         idx: number,
         field: 'quotationNumber' | 'nfNumber' | 'value' | 'freightPayer',
@@ -197,24 +235,34 @@ ${name}
         );
     };
 
-    // Remove um frete extra
-    const handleRemoveFrete = (idx: number) => {
-        setExtraFretes((prev) => prev.filter((_, i) => i !== idx));
-    };
-
-    // Handler para campo de valor formatado
-    const handleFreightValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const raw = e.target.value.replace(/\D/g, '');
-        setFreightValue(formatCurrency(raw));
-    };
-
-    const handleExtraFreteValueChange = (idx: number, value: string) => {
-        const raw = value.replace(/\D/g, '');
+    // Atualiza o valor formatado para um frete extra
+    const handleExtraFreteValueChange = (idx: number, rawValue: string) => {
+        const raw = rawValue.replace(/\D/g, '');
         setExtraFretes((prev) =>
             prev.map((f, i) =>
                 i === idx ? { ...f, value: formatCurrency(raw) } : f
             )
         );
+    };
+
+    // Atualiza o tipo de frete para um frete extra
+    const handleExtraFreightTypeChange = (idx: number, type: 'avista' | 'faturado') => {
+        setExtraFretes((prev) =>
+            prev.map((item, i) =>
+                i === idx ? { ...item, freightType: type } : item
+            )
+        );
+    };
+
+    // Remove um frete extra
+    const handleRemoveFrete = (idx: number) => {
+        setExtraFretes((prev) => prev.filter((_, i) => i !== idx));
+    };
+
+    // Handler para campo de valor formatado principal
+    const handleFreightValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/\D/g, '');
+        setFreightValue(formatCurrency(raw));
     };
 
     return (
@@ -238,6 +286,7 @@ ${name}
                         placeholder="Digite o número da NF"
                     />
                 </div>
+
                 <div className="mb-3">
                     <label className="form-label text-white">
                         Número da Cotação:
@@ -250,6 +299,7 @@ ${name}
                         placeholder="Digite o número da cotação"
                     />
                 </div>
+
                 <div className="mb-3">
                     <label className="form-label text-white">
                         Valor do Frete:
@@ -262,8 +312,36 @@ ${name}
                         placeholder="Ex: 1.234,56"
                         inputMode="decimal"
                     />
+                    <div className="d-flex gap-4 mt-2">
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="freteAVista"
+                                name="freteTipo"
+                                checked={freightType === 'avista'}
+                                onChange={() => setFreightType('avista')}
+                            />
+                            <label className="form-check-label text-white" htmlFor="freteAVista">
+                                Frete à vista
+                            </label>
+                        </div>
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="freteFaturado"
+                                name="freteTipo"
+                                checked={freightType === 'faturado'}
+                                onChange={() => setFreightType('faturado')}
+                            />
+                            <label className="form-check-label text-white" htmlFor="freteFaturado">
+                                Frete faturado
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                {/* Pagador do Frete */}
+
                 <div className="mb-3">
                     <label className="form-label text-white">
                         Pagador do Frete:
@@ -279,7 +357,7 @@ ${name}
                         <option value="Terceiro">Terceiro</option>
                     </select>
                 </div>
-                {/* CHECKBOX ABAIXO DO PAGADOR */}
+
                 <div className="form-check mb-3">
                     <input
                         className="form-check-input"
@@ -340,6 +418,45 @@ ${name}
                                         <option value="Destinatario">Destinatário</option>
                                         <option value="Terceiro">Terceiro</option>
                                     </select>
+                                    {/* Checks de tipo de frete para cada extraFrete */}
+                                    <div className="d-flex gap-4 mt-2">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id={`freteAVistaExtra${idx}`}
+                                                name={`freteTipoExtra${idx}`}
+                                                checked={f.freightType === 'avista'}
+                                                onChange={() =>
+                                                    handleExtraFreightTypeChange(idx, 'avista')
+                                                }
+                                            />
+                                            <label
+                                                className="form-check-label text-white"
+                                                htmlFor={`freteAVistaExtra${idx}`}
+                                            >
+                                                Frete à vista
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id={`freteFaturadoExtra${idx}`}
+                                                name={`freteTipoExtra${idx}`}
+                                                checked={f.freightType === 'faturado'}
+                                                onChange={() =>
+                                                    handleExtraFreightTypeChange(idx, 'faturado')
+                                                }
+                                            />
+                                            <label
+                                                className="form-check-label text-white"
+                                                htmlFor={`freteFaturadoExtra${idx}`}
+                                            >
+                                                Frete faturado
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button
                                     type="button"

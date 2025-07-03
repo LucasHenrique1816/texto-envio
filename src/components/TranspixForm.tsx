@@ -100,10 +100,35 @@ ${valorTotalTexto}
 
 Atenciosamente,
 ${name}
+`;
 
-🚚💨📦`;
+    // WhatsApp: sem emojis
+    const transpixTextoWhats = `${getGreeting()},\n
+Dados da Cotação - NF:\n
+${fretesTexto}
 
-    const transpixTextoWhats = transpixTexto;
+${valorTotalTexto}
+
+- Frete: À vista.
+
+Dados Bancários:
+
+- Chave PIX: 33.233.703/0001-19
+- Banco: Bradesco
+- Agência: 2514
+- C/C: 61330-4
+- Favorecido: Transpix Transportes e Logística Ltda.
+- CNPJ: 33.233.703/0001-19
+
+Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.
+
+Importante: Embarcaremos a mercadoria assim que o comprovante de pagamento for enviado.
+
+Por favor, envie o comprovante de pagamento.
+
+Atenciosamente,
+${name}
+`;
 
     // Checa se campos obrigatórios para copiar estão preenchidos
     const isCopyValid =
@@ -340,7 +365,7 @@ ${name}
                             <span style={{ fontSize: 22 }}>⚠️</span>
                         </div>
                         <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflowY: 'auto' }}>
-                            {transpixTexto}
+                            {showModal === 'whats' ? transpixTextoWhats : transpixTexto}
                         </pre>
                         {/* Campos de email e whatsapp no modal */}
                         {showModal === 'gmail' && (

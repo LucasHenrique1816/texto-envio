@@ -27,9 +27,18 @@ function formatCurrency(value: string) {
     return v;
 }
 
+type Quotation = {
+    quotationNumber: string;
+    value: string;
+    carrier: string;
+    payer: string;
+    freteAVista: boolean;
+    freteFaturado: boolean;
+};
+
 const QuotationForm: React.FC = () => {
-    const [quotations, setQuotations] = useState([
-        { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false }
+    const [quotations, setQuotations] = useState<Quotation[]>([
+        { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }
     ]);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -47,6 +56,21 @@ const QuotationForm: React.FC = () => {
         );
     };
 
+    // Função para alternar frete à vista/faturado (obrigatório selecionar um)
+    const handleFreteOption = (idx: number, option: 'avista' | 'faturado') => {
+        setQuotations(prev =>
+            prev.map((q, i) =>
+                i === idx
+                    ? {
+                        ...q,
+                        freteAVista: option === 'avista',
+                        freteFaturado: option === 'faturado'
+                    }
+                    : q
+            )
+        );
+    };
+
     const getGreeting = () => {
         const hour = new Date().getHours();
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
@@ -55,7 +79,10 @@ const QuotationForm: React.FC = () => {
     // Monta o texto das cotações (sem repetir prazo e validade)
     const cotacoesTexto = quotations.map((q, idx) => {
         const transp = transportadoras.find(t => t.nome === q.carrier);
-        const freteText = `Pago pelo ${q.payer}${q.freteAVista ? ' à vista' : ''} (sujeito a alteração se houver divergência nos dados informados).`;
+        let freteTipo = '';
+        if (q.freteAVista) freteTipo = 'A vista';
+        else if (q.freteFaturado) freteTipo = 'Faturado';
+        const freteText = `${freteTipo ? ` ${freteTipo}` : ''}, pago ${q.payer} (sujeito a alteração se houver divergência nos dados informados).`;
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
         return `${titulo}
 - Numero da Cotação: ${q.quotationNumber}
@@ -79,6 +106,7 @@ ${name}
 
 🚚💨📦`;
 
+    // WhatsApp: sem emoji no final
     const cotacaoTextoWhats = `${getGreeting()},\n
 ${cotacoesTexto}
 ${infoFinal}
@@ -93,7 +121,7 @@ ${name}
 
     // Limpar formulário
     const handleClear = () => {
-        setQuotations([{ quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false }]);
+        setQuotations([{ quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }]);
         setName('');
         setEmail('');
         setWhatsNumber('');
@@ -105,14 +133,14 @@ ${name}
     const handleAddQuotation = () => {
         setQuotations([
             ...quotations,
-            { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false }
+            { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }
         ]);
     };
 
     // Atualiza uma cotação específica
     const handleChangeQuotation = (
         idx: number,
-        field: 'quotationNumber' | 'value' | 'carrier' | 'payer' | 'freteAVista',
+        field: keyof Quotation,
         val: string | boolean
     ) => {
         setQuotations((prev) =>
@@ -129,7 +157,11 @@ ${name}
 
     // Validação dos campos obrigatórios
     const isCopyValid = quotations.every(q =>
-        q.quotationNumber.trim() && q.value.trim() && q.carrier && q.payer
+        q.quotationNumber.trim() &&
+        q.value.trim() &&
+        q.carrier &&
+        q.payer &&
+        (q.freteAVista || q.freteFaturado)
     ) && name.trim();
 
     const isEmailValid = isCopyValid && validateEmail(email);
@@ -238,24 +270,42 @@ ${name}
                             onChange={(e) => handleChangeQuotation(0, 'payer', e.target.value)}
                         >
                             <option value="">Selecione...</option>
-                            <option value="Remetente">Remetente</option>
-                            <option value="Destinatario">Destinatário</option>
-                            <option value="Terceiro">Terceiro</option>
+                            <option value="pelo Remetente">Remetente</option>
+                            <option value="pelo Destinatario">Destinatário</option>
+                            <option value="por Terceiro">Terceiro</option>
                         </select>
-                        <div className="form-check mt-2">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={`freteAVista0`}
-                                checked={quotations[0].freteAVista}
-                                onChange={() => handleChangeQuotation(0, 'freteAVista', !quotations[0].freteAVista)}
-                            />
-                            <label className="form-check-label text-white" htmlFor={`freteAVista0`}>
-                                Frete à vista
-                            </label>
+                        <div className="d-flex gap-4 mt-2">
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id={`freteAVista0`}
+                                    checked={quotations[0].freteAVista}
+                                    onChange={() => handleFreteOption(0, 'avista')}
+                                    name="freteTipo0"
+                                    required
+                                />
+                                <label className="form-check-label text-white" htmlFor={`freteAVista0`}>
+                                    Frete à vista
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id={`freteFaturado0`}
+                                    checked={quotations[0].freteFaturado}
+                                    onChange={() => handleFreteOption(0, 'faturado')}
+                                    name="freteTipo0"
+                                    required
+                                />
+                                <label className="form-check-label text-white" htmlFor={`freteFaturado0`}>
+                                    Frete faturado
+                                </label>
+                            </div>
                         </div>
                     </div>
-                    {/* Checkbox de adicionar mais cotações abaixo do frete à vista */}
+                    {/* Checkbox de adicionar mais cotações abaixo do frete à vista/faturado */}
                     <div className="form-check mb-3">
                         <input
                             className="form-check-input"
@@ -319,21 +369,39 @@ ${name}
                                         }
                                     >
                                         <option value="">Pagador do Frete</option>
-                                        <option value="Remetente">Remetente</option>
-                                        <option value="Destinatario">Destinatário</option>
-                                        <option value="Terceiro">Terceiro</option>
+                                        <option value="pelo Remetente">Remetente</option>
+                                        <option value="pelo Destinatario">Destinatário</option>
+                                        <option value="por Terceiro">Terceiro</option>
                                     </select>
-                                    <div className="form-check mt-2">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            id={`freteAVista${idx + 1}`}
-                                            checked={q.freteAVista}
-                                            onChange={() => handleChangeQuotation(idx + 1, 'freteAVista', !q.freteAVista)}
-                                        />
-                                        <label className="form-check-label text-white" htmlFor={`freteAVista${idx + 1}`}>
-                                            Frete à vista
-                                        </label>
+                                    <div className="d-flex gap-4 mt-2">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id={`freteAVista${idx + 1}`}
+                                                checked={q.freteAVista}
+                                                onChange={() => handleFreteOption(idx + 1, 'avista')}
+                                                name={`freteTipo${idx + 1}`}
+                                                required
+                                            />
+                                            <label className="form-check-label text-white" htmlFor={`freteAVista${idx + 1}`}>
+                                                Frete à vista
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id={`freteFaturado${idx + 1}`}
+                                                checked={q.freteFaturado}
+                                                onChange={() => handleFreteOption(idx + 1, 'faturado')}
+                                                name={`freteTipo${idx + 1}`}
+                                                required
+                                            />
+                                            <label className="form-check-label text-white" htmlFor={`freteFaturado${idx + 1}`}>
+                                                Frete faturado
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <button
