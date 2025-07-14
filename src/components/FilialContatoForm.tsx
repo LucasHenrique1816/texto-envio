@@ -45,6 +45,7 @@ Estamos à disposição para o que precisar!`,
         nome: 'Rio de Janeiro-RJ',
         texto: `📍 Dados de Contato – Filial Rio de Janeiro/RJ
 
+💬 WhatsApp: (21) 98207-9999
 💬 WhatsApp: (21) 97965-4300
 📧 E-mail: rio@transcompras.com.br
 
@@ -52,6 +53,7 @@ Estamos à disposição para o que precisar!`,
 Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Rio de Janeiro/RJ
 
+WhatsApp: (21) 98207-9999
 WhatsApp: (21) 97965-4300
 E-mail: rio@transcompras.com.br
 
