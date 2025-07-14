@@ -59,6 +59,10 @@ const USERS = [
     username: 'admin',
     hash: '$2a$10$uRhtWIiMdJyRl/3CvxoRj.46vZjyJ959DQsHm7pD36f2urAOi1/q6',
   },
+  {
+    username: 'comercial',
+    hash: '$2a$10$lM3SkkczbTT12enjaiqFL.t1ZbuQ8pHLCG4uDX6PENIl.ZOhMfNuG',
+  },
 ];
 
 const App: React.FC = () => {
