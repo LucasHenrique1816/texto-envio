@@ -127,7 +127,7 @@ body {
   position:relative;
 }
 .official-doc .doc-frame {
-  border:1px solid #222;
+  border:1px solid #223;
   padding:9mm 9mm 7mm;
 }
 .official-doc h1 {
