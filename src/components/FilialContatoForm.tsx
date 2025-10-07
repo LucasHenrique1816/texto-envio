@@ -196,7 +196,7 @@ const FilialContatoForm: React.FC = () => {
 
     return (
         <div className="container mt-5">
-            <h2 className="text-white">Texto para dados de contato das filiais</h2>
+            <h2 className="text-white">Texto para contatos das filiais</h2>
             {isAnyFieldFilled && (
                 <button className="btn btn-warning mb-3" type="button" onClick={handleClear}>
                     Limpar formulario
