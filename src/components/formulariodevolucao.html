@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário de Devolução de Materiais - DM-01</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f8f8f8;
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    form {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: auto;
+    }
+
+    fieldset {
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 6px;
+    }
+
+    legend {
+      font-weight: bold;
+      padding: 0 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .inline {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inline label {
+      flex: 1;
+    }
+
+    .assinaturas {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .assinaturas div {
+      flex: 1;
+    }
+
+    button {
+      display: block;
+      margin: 0 auto;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <h2>DEVOLUÇÃO DE MATERIAL</h2>
+    <h3>DM-01</h3>
+
+    <fieldset>
+      <legend>Dados do Remetente</legend>
+      <label>Remetente:</label>
+      <input type="text" name="remetente" required>
+
+      <div class="inline">
+        <label>Endereço:<input type="text" name="endereco_remetente"></label>
+        <label>Nº:<input type="text" name="numero_remetente" style="width: 80px;"></label>
+      </div>
+
+      <div class="inline">
+        <label>CEP:<input type="text" name="cep_remetente" style="width: 150px;"></label>
+        <label>Telefone:<input type="text" name="fone_remetente"></label>
+      </div>
+
+      <label>Responsável pela minuta:</label>
+      <input type="text" name="responsavel_minuta">
+    </fieldset>
+
+    <fieldset>
+      <legend>Dados do Destinatário</legend>
+      <label>Destinatário:</label>
+      <input type="text" name="destinatario">
+
+      <div class="inline">
+        <label>Endereço:<input type="text" name="endereco_dest"></label>
+        <label>Nº:<input type="text" name="numero_dest" style="width: 80px;"></label>
+      </div>
+
+      <div class="inline">
+        <label>CEP:<input type="text" name="cep_dest" style="width: 150px;"></label>
+        <label>Telefone:<input type="text" name="fone_dest"></label>
+      </div>
+
+      <label>Autorizado:</label>
+      <input type="text" name="autorizado">
+    </fieldset>
+
+    <fieldset>
+      <legend>Informações da Nota Fiscal</legend>
+      <div class="inline">
+        <label>Nº NF:<input type="text" name="num_nf"></label>
+        <label>Quantidade:<input type="number" name="quantidade" min="1"></label>
+        <label>Valor NF (R$):<input type="number" step="0.01" name="valor_nf"></label>
+      </div>
+      <div class="inline">
+        <label>Peso:<input type="text" name="peso"></label>
+        <label>Nº Manifesto:<input type="text" name="manifesto"></label>
+      </div>
+      <label>Data:</label>
+      <input type="date" name="data">
+    </fieldset>
+
+    <fieldset>
+      <legend>Informações do Motorista</legend>
+      <label>Motorista:</label>
+      <input type="text" name="motorista">
+      <div class="inline">
+        <label><input type="radio" name="tipo_frota" value="frota"> Frota</label>
+        <label><input type="radio" name="tipo_frota" value="agregado"> Agregado</label>
+        <label><input type="radio" name="tipo_frota" value="terceiro"> Terceiro</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Descrição do(s) Material(is)</legend>
+      <textarea name="descricao" rows="5" placeholder="Descreva o(s) material(is)..."></textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Justificativa do Material Devolvido</legend>
+      <textarea name="justificativa" rows="5" placeholder="Explique o motivo da devolução..."></textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Entrega e Recebimento</legend>
+      <label>Local de Entrega:</label>
+      <input type="text" name="local_entrega">
+
+      <label>DM nº:</label>
+      <input type="text" name="dm_num" value="01" readonly>
+
+      <label>Data do Recebimento:</label>
+      <input type="date" name="data_recebimento">
+
+      <div class="assinaturas">
+        <div>
+          <label>Rúbrica do Recebedor:</label>
+          <input type="text" name="rubrica">
+        </div>
+        <div>
+          <label>Assinatura e Carimbo do Responsável:</label>
+          <input type="text" name="assinatura">
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit">Enviar Formulário</button>
+  </form>
+</body>
+</html>
