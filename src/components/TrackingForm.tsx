@@ -20,7 +20,7 @@ const stateOptions = [
 const transportadoras = [
     {
         nome: 'Transpix',
-        razao: 'TRANSPIX - Transportes e LogÃ­stica LTDA',
+        razao: 'TRANSPIX - Transportes e Logi­stica LTDA',
     },
     {
         nome: 'Transcompras',
@@ -104,7 +104,7 @@ const TrackingForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false })
     const handleCopy = () => {
         if (!isCopyValid) return;
         navigator.clipboard.writeText(trackingText).then(() => {
-            alert('Texto copiado para a Ã¡rea de transferÃªncia!');
+            alert('Texto copiado para a Ã¡rea de transferencia!');
         });
         setShowModal(null);
     };
@@ -125,7 +125,7 @@ const TrackingForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false })
 
     const handleSendWhatsApp = () => {
         if (!isWhatsValid) {
-            alert('Digite um nÃºmero de WhatsApp vÃ¡lido.');
+            alert('Digite um número de WhatsApp válido.');
             return;
         }
         let number = whatsNumber.replace(/\D/g, '');
@@ -142,7 +142,7 @@ const TrackingForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false })
             <h2 className="text-white">Rastreamento de nota fiscal</h2>
             {isAnyFieldFilled && (
                 <button className="btn btn-warning mb-3" type="button" onClick={handleClear}>
-                    Limpar formulÃ¡rio
+                    Limpar formulário
                 </button>
             )}
             <form className="bg-dark p-4 rounded" onSubmit={e => e.preventDefault()}>

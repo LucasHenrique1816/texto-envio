@@ -199,7 +199,7 @@ const FilialContatoForm: React.FC = () => {
             <h2 className="text-white">Texto para dados de contato das filiais</h2>
             {isAnyFieldFilled && (
                 <button className="btn btn-warning mb-3" type="button" onClick={handleClear}>
-                    Limpar formulÃ¡rio
+                    Limpar formulario
                 </button>
             )}
             <form className="bg-dark p-4 rounded" onSubmit={e => e.preventDefault()}>
