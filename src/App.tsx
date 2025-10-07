@@ -12,7 +12,7 @@ import FilialContatoForm from './components/FilialContatoForm';
 import TermoIsencaoAvariaForm from './components/TermoIsencaoAvariaForm';
 import AutorizacaoEmbarqueForm from './components/AutorizacaoEmbarqueForm';
 import FormDevolucaoA from './components/FormDevolucaoA';
-import logo from './assets/logofinal.png';
+import logo from 'public/logo/logofinal.png';
 import { supabase } from './supabase';
 import bcrypt from 'bcryptjs';
 
