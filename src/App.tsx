@@ -173,10 +173,6 @@ const App: React.FC = () => {
     }
   };
 
-  const USERS = [
-    { username: 'pendencia', hash: '$2a$10$tw5jYUEuXr7TW8rIVBQSkuHxNtICQPvqi5lMRK6nN9KrpNHdY31JK' },
-  ];
-
   // Funções auxiliares da área administrativa
   const openPwdModal = (userLogin: string) => {
     if(!loggedUser) return;
