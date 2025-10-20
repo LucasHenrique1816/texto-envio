@@ -9,6 +9,7 @@ const filiais = [
 💬 WhatsApp: (79) 3114-4860
 ✉️ E-mail para cotações: cotacao.se@transcompras.com.br
 ✉️ E-mail para coletas: coleta.se@transcompras.com.br
+✉️ E-mail para comprovante de entrega: leadtime@transcompras.com.br
 
 🚚 Transcompras & Transpix Transportes
 Estamos à disposição para o que precisar!`,
@@ -18,6 +19,7 @@ Telefone fixo: (79) 3114-4861
 WhatsApp: (79) 3114-4860
 E-mail para cotações: cotacao.se@transcompras.com.br
 E-mail para coletas: coleta.se@transcompras.com.br
+E-mail para comprovante de entrega: leadtime@transcompras.com.br
 
 Transcompras & Transpix Transportes
 Estamos à disposição para o que precisar!`,
@@ -64,16 +66,16 @@ Estamos à disposição para o que precisar!`,
         nome: 'Maceió-AL',
         texto: `📍 Dados de Contato – Filial Maceió/AL
 
-📞 Telefone fixo: (82) 2126-4600
-💬 WhatsApp: (82) 2126-4904
+📞 Telefone fixo: (82) 2126-4900
+💬 WhatsApp: (82) 2126-4900
 ✉️ E-mail: atendimento.mcz@transpixlog.com.br
 
 🚚 Transcompras & Transpix Transportes
 Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Maceió/AL
 
-Telefone fixo: (82) 2126-4600
-WhatsApp: (82) 2126-4904
+Telefone fixo: (82) 2126-4900
+WhatsApp: (82) 2126-4900
 E-mail: atendimento.mcz@transpixlog.com.br
 
 Transcompras & Transpix Transportes
