@@ -676,7 +676,7 @@ const App: React.FC = () => {
 
       if (error) {
         console.error('Erro ao buscar usuário:', error);
-        // Se der erro no Supabase, tenta os usuários padrão
+        setLoginError('Falha ao validar usuário. Tente novamente.');
         return;
       }
 
