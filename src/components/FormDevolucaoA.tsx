@@ -8,6 +8,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import logotranspix from './assets/transpix.png';
+import logotranscompras from './assets/transcompras.png';
 
 interface DevolucaoFormData {
   remetente: string;
@@ -60,7 +62,7 @@ const companyData: Record<'transpix' | 'transcompras', {
     numero: '173',
     cep: '07221-040',
     fone: '(11) 3927-2050',
-    logo: './assets/transpix.png'
+    logo: {logotranspix}
   },
   transcompras: {
     razao: 'Transcompras - Transporte e Compras Comerciais LTDA',
@@ -68,7 +70,7 @@ const companyData: Record<'transpix' | 'transcompras', {
     numero: '173',
     cep: '07221-040',
     fone: '(11) 3927-2050',
-    logo: './assets/transcompras.png'
+    logo: {logotranscompras}
   }
 };
 
