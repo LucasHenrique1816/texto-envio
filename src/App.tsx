@@ -677,7 +677,6 @@ const App: React.FC = () => {
       if (error) {
         console.error('Erro ao buscar usuário:', error);
         // Se der erro no Supabase, tenta os usuários padrão
-        await loginWithDefaultUsers();
         return;
       }
 
@@ -697,36 +696,13 @@ const App: React.FC = () => {
           setLoginError('Usuário ou senha inválidos');
           return;
         }
-      } else {
-        // Usuário não encontrado no banco, tenta os usuários padrão
-        await loginWithDefaultUsers();
-      }
+      } 
     } catch (error) {
       console.error('Erro na autenticação:', error);
       setLoginError('Erro interno. Tente novamente.');
     }
   }
 
-  // Função auxiliar para login com usuários padrão
-  async function loginWithDefaultUsers() {
-    const user = USERS.find(u => u.username === loginUser.trim());
-    if (!user) {
-      setLoginError('Usuário ou senha inválidos');
-      return;
-    }
-    
-    const ok = await bcrypt.compare(loginPass, user.hash);
-    if (!ok) {
-      setLoginError('Usuário ou senha inválidos');
-      return;
-    }
-    
-  setLoggedUser({ login: user.username, nome_completo: user.username.charAt(0).toUpperCase() + user.username.slice(1), role: 'admin' });
-  setMustChangePassword(false);
-    setLoginUser('');
-    setLoginPass('');
-    setScreen('setor');
-  }
 
   // Setor selection screen
   if (screen === 'setor') {
