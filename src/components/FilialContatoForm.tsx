@@ -6,7 +6,7 @@ const filiais = [
         texto: `📍 Dados de Contato – Filial Aracaju/SE
 
 📞 Telefone fixo: (79) 3114-4861
-💬 WhatsApp: (79) 3114-4860
+💬 WhatsApp: (79) 9819-2318
 ✉️ E-mail para cotações: cotacao.se@transcompras.com.br
 ✉️ E-mail para coletas: coleta.se@transcompras.com.br
 ✉️ E-mail para comprovante de entrega: leadtime@transcompras.com.br
@@ -16,7 +16,7 @@ Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Aracaju/SE
 
 Telefone fixo: (79) 3114-4861
-WhatsApp: (79) 3114-4860
+WhatsApp: WhatsApp: (79) 9819-2318
 E-mail para cotações: cotacao.se@transcompras.com.br
 E-mail para coletas: coleta.se@transcompras.com.br
 E-mail para comprovante de entrega: leadtime@transcompras.com.br
