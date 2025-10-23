@@ -8,8 +8,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logotranspix from './assets/transpix.png';
-import logotranscompras from './assets/transcompras.png';
+import logotranspix from './src/assets/transpix.png';
+import logotranscompras from './src/assets/transcompras.png';
 
 interface DevolucaoFormData {
   remetente: string;
