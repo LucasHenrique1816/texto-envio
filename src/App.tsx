@@ -658,7 +658,7 @@ const App: React.FC = () => {
     );
   }
 
-  async function handleLogin() {
+ async function handleLogin() {
     setLoginError('');
     
     if (!loginUser.trim() || !loginPass.trim()) {
@@ -667,10 +667,9 @@ const App: React.FC = () => {
     }
 
     try {
-      // Primeiro tenta buscar no banco de dados Supabase
       const { data: usuarios, error } = await supabase
         .from('usuarios')
-  .select('login, senha_hash, nome_completo, role, must_change_password')
+        .select('login, senha_hash, nome_completo, role, must_change_password')
         .eq('login', loginUser.trim())
         .limit(1);
 
@@ -680,23 +679,23 @@ const App: React.FC = () => {
         return;
       }
 
-      if (usuarios && usuarios.length > 0) {
-        // Usuário encontrado no banco, verifica a senha
-        const usuario = usuarios[0];
-        const senhaValida = await bcrypt.compare(loginPass, usuario.senha_hash);
-        
-        if (senhaValida) {
-          setLoggedUser({ login: usuario.login, nome_completo: usuario.nome_completo, role: usuario.role });
-          setMustChangePassword(!!(usuario as any).must_change_password);
-          setLoginUser('');
-          setLoginPass('');
-          if ((usuario as any).must_change_password) setScreen('changePassword'); else setScreen('setor');
-          return;
-        } else {
-          setLoginError('Usuário ou senha inválidos');
-          return;
-        }
-      } 
+      if (!usuarios || usuarios.length === 0) {
+        setLoginError('Usuário ou senha inválidos');
+        return;
+      }
+
+      const usuario = usuarios[0];
+      const senhaValida = await bcrypt.compare(loginPass, usuario.senha_hash);
+      if (!senhaValida) {
+        setLoginError('Usuário ou senha inválidos');
+        return;
+      }
+
+      setLoggedUser({ login: usuario.login, nome_completo: usuario.nome_completo, role: usuario.role });
+      setMustChangePassword(!!(usuario as any).must_change_password);
+      setLoginUser('');
+      setLoginPass('');
+      if ((usuario as any).must_change_password) setScreen('changePassword'); else setScreen('setor');
     } catch (error) {
       console.error('Erro na autenticação:', error);
       setLoginError('Erro interno. Tente novamente.');
