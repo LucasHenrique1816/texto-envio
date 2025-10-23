@@ -62,7 +62,7 @@ const companyData: Record<'transpix' | 'transcompras', {
     numero: '173',
     cep: '07221-040',
     fone: '(11) 3927-2050',
-    logo: {logotranspix}
+    logo: logotranspix,
   },
   transcompras: {
     razao: 'Transcompras - Transporte e Compras Comerciais LTDA',
@@ -70,7 +70,7 @@ const companyData: Record<'transpix' | 'transcompras', {
     numero: '173',
     cep: '07221-040',
     fone: '(11) 3927-2050',
-    logo: {logotranscompras}
+    logo: logotranscompras,
   }
 };
 
