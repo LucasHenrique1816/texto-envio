@@ -67,7 +67,7 @@ Estamos à disposição para o que precisar!`,
         texto: `📍 Dados de Contato – Filial Maceió/AL
 
 📞 Telefone fixo: (82) 2126-4900
-💬 WhatsApp: (82) 2126-4900
+💬 WhatsApp: (82) 9976-0088
 ✉️ E-mail: atendimento.mcz@transpixlog.com.br
 
 🚚 Transcompras & Transpix Transportes
@@ -75,7 +75,7 @@ Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Maceió/AL
 
 Telefone fixo: (82) 2126-4900
-WhatsApp: (82) 2126-4900
+WhatsApp: (82) 9976-0088
 E-mail: atendimento.mcz@transpixlog.com.br
 
 Transcompras & Transpix Transportes
