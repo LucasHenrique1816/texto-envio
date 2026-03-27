@@ -156,7 +156,7 @@ ${infoFinal}
 
 🔔 Dúvidas ou negociações? Estamos à disposição!
 
-Desculpe pela demora e obrigado pela paciência.
+Obrigado por aguardar.
 
 Atenciosamente,
 ${name}
@@ -170,7 +170,7 @@ ${infoFinal}
 
 Dúvidas ou negociações? Estamos à disposição!
 
-Desculpe pela demora e obrigado pela paciência.
+Obrigado por aguardar.
 
 Atenciosamente,
 ${name}
