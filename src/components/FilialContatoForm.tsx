@@ -28,7 +28,7 @@ Estamos à disposição para o que precisar!`,
         nome: 'Salvador-BA',
         texto: `📍 Dados de Contato – Filial Salvador/BA
 
-📞 Telefone fixo: (71) 3616-3351
+📞 Telefone fixo: (71) 3616-3350
 💬 WhatsApp: (71) 9313-8000
 ✉️ E-mail: coleta.ba@transcompras.com.br
 
@@ -36,7 +36,7 @@ Estamos à disposição para o que precisar!`,
 Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Salvador/BA
 
-Telefone fixo: (71) 3616-3351
+Telefone fixo: (71) 3616-3350
 WhatsApp: (71) 9313-8000
 E-mail: coleta.ba@transcompras.com.br
 
