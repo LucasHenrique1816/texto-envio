@@ -85,7 +85,7 @@ Estamos à disposição para o que precisar!`,
         nome: 'Recife-PE',
         texto: `📍 Dados de Contato – Filial Recife/PE
 
-📞 Telefone fixo: (81) 3972-7411
+📞 Telefone fixo: (81) 3972-7400
 💬 WhatsApp: (81) 9696-8080
 ✉️ E-mail: atendimento.rec@transcompras.com.br
 
@@ -93,7 +93,7 @@ Estamos à disposição para o que precisar!`,
 Estamos à disposição para o que precisar!`,
         textoSemEmojis: `Dados de Contato – Filial Recife/PE
 
-Telefone fixo: (81) 3972-7411
+Telefone fixo: (81) 3972-7400
 WhatsApp: (81) 9696-8080
 E-mail: atendimento.rec@transcompras.com.br
 
