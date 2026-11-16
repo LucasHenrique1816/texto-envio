@@ -222,7 +222,7 @@ const QuotationForm: React.FC<FormProps> = ({
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
 
         const valorLinha = q.hasDiscount && q.discountedValue
-            ? `- Valor: R$ ${q.value}\n- Valor com desconto ${promoName}: R$ ${q.discountedValue}`
+            ? `- Valor: R$ ${q.value}\n\n- Valor com desconto ${promoName}: R$ ${q.discountedValue}`
             : `- Valor: R$ ${q.value}`;
 
         return `${titulo}
@@ -246,7 +246,7 @@ ${valorLinha}
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
 
         const valorLinhaDestaque = q.hasDiscount && q.discountedValue
-            ? `~Valor: R$ ${q.value}~\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
+            ? `~Valor: R$ ${q.value}~\n\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
             : `- Valor: R$ ${q.value}`;
 
         return `${titulo}
@@ -260,12 +260,13 @@ ${valorLinhaDestaque}
 
     }).join('\n\n');
 
-    const infoFinal = `\n- Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.\n- Validade da cotação: 30 dias.`;
+    const infoFinal = `\n\n- Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.\n\n- Validade da cotação: 30 dias.`;
 
     // Texto para Gmail (limpo)
-    const cotacaoTextoEmail = `${getGreeting()},\n
-${cotacoesTextoEmail}
-${infoFinal}
+    const cotacaoTextoEmail = `${getGreeting()},
+
+${cotacoesTextoEmail}${infoFinal}
+
 
 🔔 Dúvidas ou negociações? Estamos à disposição!
 
@@ -277,9 +278,10 @@ ${name}
 🚚💨📦`;
 
     // Texto para Copiar e Pré-visualização (com risco e destaque + emojis)
-    const cotacaoTextoCopy = `${getGreeting()},\n
-${cotacoesTextoDestaque}
-${infoFinal}
+    const cotacaoTextoCopy = `${getGreeting()},
+
+${cotacoesTextoDestaque}${infoFinal}
+
 
 🔔 Dúvidas ou negociações? Estamos à disposição!
 
@@ -291,9 +293,10 @@ ${name}
 🚚💨📦`;
 
     // WhatsApp: com risco e destaque, sem emoji no final
-    const cotacaoTextoWhats = `${getGreeting()},\n
-${cotacoesTextoDestaque}
-${infoFinal}
+    const cotacaoTextoWhats = `${getGreeting()},
+
+${cotacoesTextoDestaque}${infoFinal}
+
 
 Dúvidas ou negociações? Estamos à disposição!
 
