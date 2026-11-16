@@ -8,6 +8,8 @@ type FormProps = {
     role: string;
   } | null;
   readOnlyName?: boolean;
+  discountPercent?: number;
+  promoName?: string;
 };
 
 const transportadoras = [
@@ -37,6 +39,21 @@ function formatCurrency(value: string) {
     return v;
 }
 
+// Converte string formatada "1.234,56" em número 1234.56
+function parseCurrency(formattedValue: string): number {
+    if (!formattedValue) return 0;
+    const clean = formattedValue.replace(/\./g, '').replace(',', '.');
+    return parseFloat(clean) || 0;
+}
+
+// Formata número 1234.56 de volta para "1.234,56"
+function formatNumberToCurrency(num: number): string {
+    return num.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
 type Quotation = {
     quotationNumber: string;
     value: string;
@@ -44,11 +61,27 @@ type Quotation = {
     payer: string;
     freteAVista: boolean;
     freteFaturado: boolean;
+    hasDiscount: boolean;
+    discountedValue: string;
 };
 
-const QuotationForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false }) => {
+const QuotationForm: React.FC<FormProps> = ({
+    loggedUser,
+    readOnlyName = false,
+    discountPercent = 5,
+    promoName = 'MES BLACK',
+}) => {
     const [quotations, setQuotations] = useState<Quotation[]>([
-        { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }
+        {
+            quotationNumber: '',
+            value: '',
+            carrier: '',
+            payer: '',
+            freteAVista: false,
+            freteFaturado: false,
+            hasDiscount: false,
+            discountedValue: '',
+        }
     ]);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -106,10 +139,57 @@ const QuotationForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false }
     // Função para atualizar o campo valor formatado
     const handleValueChange = (idx: number, value: string) => {
         const raw = value.replace(/\D/g, '');
+        const formatted = formatCurrency(raw);
         setQuotations(prev =>
-            prev.map((q, i) =>
-                i === idx ? { ...q, value: formatCurrency(raw) } : q
-            )
+            prev.map((q, i) => {
+                if (i !== idx) return q;
+                // Se já havia um desconto calculado, recalcula automaticamente ao digitar novo valor
+                let updatedDiscounted = q.discountedValue;
+                if (q.hasDiscount && q.discountedValue) {
+                    const numeric = parseCurrency(formatted);
+                    if (numeric > 0) {
+                        const discounted = numeric * (1 - discountPercent / 100);
+                        updatedDiscounted = formatNumberToCurrency(discounted);
+                    } else {
+                        updatedDiscounted = '';
+                    }
+                }
+                return { ...q, value: formatted, discountedValue: updatedDiscounted };
+            })
+        );
+    };
+
+    // Alterna checkbox de desconto
+    const handleToggleDiscount = (idx: number) => {
+        setQuotations(prev =>
+            prev.map((q, i) => {
+                if (i !== idx) return q;
+                const nextHasDiscount = !q.hasDiscount;
+                return {
+                    ...q,
+                    hasDiscount: nextHasDiscount,
+                    discountedValue: nextHasDiscount ? q.discountedValue : '',
+                };
+            })
+        );
+    };
+
+    // Calcula o valor com desconto ao clicar no botão
+    const handleCalculateDiscount = (idx: number) => {
+        setQuotations(prev =>
+            prev.map((q, i) => {
+                if (i !== idx) return q;
+                const numeric = parseCurrency(q.value);
+                if (numeric <= 0) {
+                    alert('Digite o valor do frete antes de calcular o desconto.');
+                    return q;
+                }
+                const discounted = numeric * (1 - discountPercent / 100);
+                return {
+                    ...q,
+                    discountedValue: formatNumberToCurrency(discounted),
+                };
+            })
         );
     };
 
@@ -133,7 +213,7 @@ const QuotationForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false }
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
-    // Monta o texto das cotações (sem repetir prazo e validade)
+    // Monta o texto das cotações (versão limpa para Cópia / Gmail / Pré-visualização)
     const cotacoesTexto = quotations.map((q, idx) => {
         const transp = transportadoras.find(t => t.nome === q.carrier);
         let freteTipo = '';
@@ -141,11 +221,44 @@ const QuotationForm: React.FC<FormProps> = ({ loggedUser, readOnlyName = false }
         else if (q.freteFaturado) freteTipo = 'Faturado';
         const freteText = `${freteTipo ? ` ${freteTipo}` : ''}, pago ${q.payer} (sujeito a alteração se houver divergência nos dados informados).`;
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
+
+        const valorLinha = q.hasDiscount && q.discountedValue
+            ? `- Valor: R$ ${q.value}\n\n- Valor com desconto ${promoName}: R$ ${q.discountedValue}`
+            : `- Valor: R$ ${q.value}`;
+
         return `${titulo}
 - Numero da Cotação: ${q.quotationNumber}
-- Valor: R$ ${q.value}
+
+${valorLinha}
+
 - Transportadora: ${transp ? `${transp.razao} (${transp.cnpj})` : ''}
+
 - Frete: ${freteText}`;
+
+    }).join('\n\n');
+
+    // Monta o texto das cotações para WhatsApp (valor original riscado e valor com desconto em negrito)
+    const cotacoesTextoWhats = quotations.map((q, idx) => {
+        const transp = transportadoras.find(t => t.nome === q.carrier);
+        let freteTipo = '';
+        if (q.freteAVista) freteTipo = 'A vista';
+        else if (q.freteFaturado) freteTipo = 'Faturado';
+        const freteText = `${freteTipo ? ` ${freteTipo}` : ''}, pago ${q.payer} (sujeito a alteração se houver divergência nos dados informados).`;
+        const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
+
+        const valorLinhaWhats = q.hasDiscount && q.discountedValue
+            ? `~Valor: R$ ${q.value}~\n\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
+            : `- Valor: R$ ${q.value}`;
+
+        return `${titulo}
+- Numero da Cotação: ${q.quotationNumber}
+
+${valorLinhaWhats}
+
+- Transportadora: ${transp ? `${transp.razao} (${transp.cnpj})` : ''}
+
+- Frete: ${freteText}`;
+
     }).join('\n\n');
 
     const infoFinal = `\n- Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.\n- Validade da cotação: 30 dias.`;
@@ -165,7 +278,7 @@ ${name}
 
     // WhatsApp: sem emoji no final
     const cotacaoTextoWhats = `${getGreeting()},\n
-${cotacoesTexto}
+${cotacoesTextoWhats}
 ${infoFinal}
 
 Dúvidas ou negociações? Estamos à disposição!
@@ -178,7 +291,16 @@ ${name}
 
     // Limpar formulário
     const handleClear = () => {
-        setQuotations([{ quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }]);
+        setQuotations([{
+            quotationNumber: '',
+            value: '',
+            carrier: '',
+            payer: '',
+            freteAVista: false,
+            freteFaturado: false,
+            hasDiscount: false,
+            discountedValue: '',
+        }]);
         setName('');
         setEmail('');
         setWhatsNumber('');
@@ -190,7 +312,16 @@ ${name}
     const handleAddQuotation = () => {
         setQuotations([
             ...quotations,
-            { quotationNumber: '', value: '', carrier: '', payer: '', freteAVista: false, freteFaturado: false }
+            {
+                quotationNumber: '',
+                value: '',
+                carrier: '',
+                payer: '',
+                freteAVista: false,
+                freteFaturado: false,
+                hasDiscount: false,
+                discountedValue: '',
+            }
         ]);
     };
 
@@ -218,7 +349,8 @@ ${name}
         q.value.trim() &&
         q.carrier &&
         q.payer &&
-        (q.freteAVista || q.freteFaturado)
+        (q.freteAVista || q.freteFaturado) &&
+        (!q.hasDiscount || q.discountedValue.trim())
     ) && name.trim();
 
     const isEmailValid = isCopyValid && validateEmail(email);
@@ -298,14 +430,43 @@ ${name}
                         <label className="form-label text-white">
                             Valor:
                         </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={quotations[0].value}
-                            onChange={(e) => handleValueChange(0, e.target.value)}
-                            placeholder="Ex: 1.234,56"
-                            inputMode="decimal"
-                        />
+                        <div className="d-flex gap-2">
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={quotations[0].value}
+                                onChange={(e) => handleValueChange(0, e.target.value)}
+                                placeholder="Ex: 1.234,56"
+                                inputMode="decimal"
+                            />
+                            {quotations[0].hasDiscount && (
+                                <button
+                                    type="button"
+                                    className="btn btn-info text-nowrap"
+                                    onClick={() => handleCalculateDiscount(0)}
+                                >
+                                    Calcular desconto
+                                </button>
+                            )}
+                        </div>
+                        <div className="form-check mt-2">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="hasDiscount0"
+                                checked={quotations[0].hasDiscount}
+                                onChange={() => handleToggleDiscount(0)}
+                            />
+                            <label className="form-check-label text-white" htmlFor="hasDiscount0">
+                                Aplicar desconto ({promoName} - {discountPercent}%)
+                            </label>
+                        </div>
+                        {quotations[0].hasDiscount && quotations[0].discountedValue && (
+                            <div className="alert alert-success py-2 px-3 mt-2 mb-0">
+                                Valor com desconto {promoName} ({discountPercent}%):{' '}
+                                <strong>R$ {quotations[0].discountedValue}</strong>
+                            </div>
+                        )}
                     </div>
                     <div className="mb-3">
                         <label className="form-label text-white">
@@ -401,16 +562,45 @@ ${name}
                                             handleChangeQuotation(idx + 1, 'quotationNumber', onlyNumbers(e.target.value))
                                         }
                                     />
-                                    <input
-                                        type="text"
-                                        className="form-control mb-1"
-                                        placeholder="Valor (Ex: 1.234,56)"
-                                        value={q.value}
-                                        onChange={e =>
-                                            handleValueChange(idx + 1, e.target.value)
-                                        }
-                                        inputMode="decimal"
-                                    />
+                                    <div className="d-flex gap-2 mb-1">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Valor (Ex: 1.234,56)"
+                                            value={q.value}
+                                            onChange={e =>
+                                                handleValueChange(idx + 1, e.target.value)
+                                            }
+                                            inputMode="decimal"
+                                        />
+                                        {q.hasDiscount && (
+                                            <button
+                                                type="button"
+                                                className="btn btn-info text-nowrap"
+                                                onClick={() => handleCalculateDiscount(idx + 1)}
+                                            >
+                                                Calcular desconto
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="form-check mb-1">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id={`hasDiscount${idx + 1}`}
+                                            checked={q.hasDiscount}
+                                            onChange={() => handleToggleDiscount(idx + 1)}
+                                        />
+                                        <label className="form-check-label text-white" htmlFor={`hasDiscount${idx + 1}`}>
+                                            Aplicar desconto ({promoName} - {discountPercent}%)
+                                        </label>
+                                    </div>
+                                    {q.hasDiscount && q.discountedValue && (
+                                        <div className="alert alert-success py-1 px-2 mb-1">
+                                            Valor com desconto {promoName} ({discountPercent}%):{' '}
+                                            <strong>R$ {q.discountedValue}</strong>
+                                        </div>
+                                    )}
                                     <select
                                         className="form-select mb-1"
                                         value={q.carrier}
@@ -559,7 +749,11 @@ ${name}
                             <span style={{ fontSize: 22 }}>⚠️</span>
                         </div>
                         <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflowY: 'auto' }}>
-                            {showModal === 'dados' ? dadosCotacaoTexto : cotacaoTexto}
+                            {showModal === 'dados'
+                                ? dadosCotacaoTexto
+                                : showModal === 'whats'
+                                ? cotacaoTextoWhats
+                                : cotacaoTexto}
                         </pre>
                         {showModal === 'dados' && (
                             <div className="row g-2 mt-2">
