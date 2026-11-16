@@ -46,7 +46,7 @@ function parseCurrency(formattedValue: string): number {
     return parseFloat(clean) || 0;
 }
 
-// Formata número 1234.56 de volta para "1.234,56"
+// Formata número arredondado para "1.234,00"
 function formatNumberToCurrency(num: number): string {
     return num.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
@@ -143,12 +143,11 @@ const QuotationForm: React.FC<FormProps> = ({
         setQuotations(prev =>
             prev.map((q, i) => {
                 if (i !== idx) return q;
-                // Se já havia um desconto calculado, recalcula automaticamente ao digitar novo valor
                 let updatedDiscounted = q.discountedValue;
                 if (q.hasDiscount && q.discountedValue) {
                     const numeric = parseCurrency(formatted);
                     if (numeric > 0) {
-                        const discounted = numeric * (1 - discountPercent / 100);
+                        const discounted = Math.floor(numeric * (1 - discountPercent / 100));
                         updatedDiscounted = formatNumberToCurrency(discounted);
                     } else {
                         updatedDiscounted = '';
@@ -174,7 +173,7 @@ const QuotationForm: React.FC<FormProps> = ({
         );
     };
 
-    // Calcula o valor com desconto ao clicar no botão
+    // Calcula o valor com desconto arredondado para baixo (ex: 55,50 -> 55,00)
     const handleCalculateDiscount = (idx: number) => {
         setQuotations(prev =>
             prev.map((q, i) => {
@@ -184,7 +183,7 @@ const QuotationForm: React.FC<FormProps> = ({
                     alert('Digite o valor do frete antes de calcular o desconto.');
                     return q;
                 }
-                const discounted = numeric * (1 - discountPercent / 100);
+                const discounted = Math.floor(numeric * (1 - discountPercent / 100));
                 return {
                     ...q,
                     discountedValue: formatNumberToCurrency(discounted),
@@ -213,8 +212,8 @@ const QuotationForm: React.FC<FormProps> = ({
         return hour < 12 ? 'Bom dia' : 'Boa tarde';
     };
 
-    // Monta o texto das cotações (versão limpa para Cópia / Gmail / Pré-visualização)
-    const cotacoesTexto = quotations.map((q, idx) => {
+    // Monta o texto das cotações (versão limpa para Gmail)
+    const cotacoesTextoEmail = quotations.map((q, idx) => {
         const transp = transportadoras.find(t => t.nome === q.carrier);
         let freteTipo = '';
         if (q.freteAVista) freteTipo = 'A vista';
@@ -223,7 +222,7 @@ const QuotationForm: React.FC<FormProps> = ({
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
 
         const valorLinha = q.hasDiscount && q.discountedValue
-            ? `- Valor: R$ ${q.value}\n\n- Valor com desconto ${promoName}: R$ ${q.discountedValue}`
+            ? `- Valor: R$ ${q.value}\n- Valor com desconto ${promoName}: R$ ${q.discountedValue}`
             : `- Valor: R$ ${q.value}`;
 
         return `${titulo}
@@ -237,8 +236,8 @@ ${valorLinha}
 
     }).join('\n\n');
 
-    // Monta o texto das cotações para WhatsApp (valor original riscado e valor com desconto em negrito)
-    const cotacoesTextoWhats = quotations.map((q, idx) => {
+    // Monta o texto das cotações com formatação de risco e destaque (para Copiar e WhatsApp)
+    const cotacoesTextoDestaque = quotations.map((q, idx) => {
         const transp = transportadoras.find(t => t.nome === q.carrier);
         let freteTipo = '';
         if (q.freteAVista) freteTipo = 'A vista';
@@ -246,14 +245,14 @@ ${valorLinha}
         const freteText = `${freteTipo ? ` ${freteTipo}` : ''}, pago ${q.payer} (sujeito a alteração se houver divergência nos dados informados).`;
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
 
-        const valorLinhaWhats = q.hasDiscount && q.discountedValue
-            ? `~Valor: R$ ${q.value}~\n\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
+        const valorLinhaDestaque = q.hasDiscount && q.discountedValue
+            ? `~Valor: R$ ${q.value}~\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
             : `- Valor: R$ ${q.value}`;
 
         return `${titulo}
 - Numero da Cotação: ${q.quotationNumber}
 
-${valorLinhaWhats}
+${valorLinhaDestaque}
 
 - Transportadora: ${transp ? `${transp.razao} (${transp.cnpj})` : ''}
 
@@ -263,8 +262,9 @@ ${valorLinhaWhats}
 
     const infoFinal = `\n- Prazo de entrega: 6 a 10 dias corridos a partir da data de embarque.\n- Validade da cotação: 30 dias.`;
 
-    const cotacaoTexto = `${getGreeting()},\n
-${cotacoesTexto}
+    // Texto para Gmail (limpo)
+    const cotacaoTextoEmail = `${getGreeting()},\n
+${cotacoesTextoEmail}
 ${infoFinal}
 
 🔔 Dúvidas ou negociações? Estamos à disposição!
@@ -276,9 +276,23 @@ ${name}
 
 🚚💨📦`;
 
-    // WhatsApp: sem emoji no final
+    // Texto para Copiar e Pré-visualização (com risco e destaque + emojis)
+    const cotacaoTextoCopy = `${getGreeting()},\n
+${cotacoesTextoDestaque}
+${infoFinal}
+
+🔔 Dúvidas ou negociações? Estamos à disposição!
+
+Obrigado por aguardar.
+
+Atenciosamente,
+${name}
+
+🚚💨📦`;
+
+    // WhatsApp: com risco e destaque, sem emoji no final
     const cotacaoTextoWhats = `${getGreeting()},\n
-${cotacoesTextoWhats}
+${cotacoesTextoDestaque}
 ${infoFinal}
 
 Dúvidas ou negociações? Estamos à disposição!
@@ -362,7 +376,7 @@ ${name}
     // Funções de envio
     const handleCopy = () => {
         if (!isCopyValid) return;
-        navigator.clipboard.writeText(cotacaoTexto).then(() => {
+        navigator.clipboard.writeText(cotacaoTextoCopy).then(() => {
             alert('Texto copiado para a área de transferência!');
         });
         setShowModal(null);
@@ -374,7 +388,7 @@ ${name}
             return;
         }
         const subject = encodeURIComponent(`Cotação ${quotations[0].quotationNumber}`);
-        const body = encodeURIComponent(cotacaoTexto);
+        const body = encodeURIComponent(cotacaoTextoEmail);
         window.open(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
             '_blank'
@@ -719,7 +733,7 @@ ${name}
                 <div className="mt-4">
                     <label className="form-label text-white">Pré-visualização:</label>
                     <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
-                        {cotacaoTexto}
+                        {cotacaoTextoCopy}
                     </pre>
                 </div>
             </form>
@@ -753,7 +767,9 @@ ${name}
                                 ? dadosCotacaoTexto
                                 : showModal === 'whats'
                                 ? cotacaoTextoWhats
-                                : cotacaoTexto}
+                                : showModal === 'gmail'
+                                ? cotacaoTextoEmail
+                                : cotacaoTextoCopy}
                         </pre>
                         {showModal === 'dados' && (
                             <div className="row g-2 mt-2">
