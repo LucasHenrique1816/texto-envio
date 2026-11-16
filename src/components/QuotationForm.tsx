@@ -246,7 +246,7 @@ ${valorLinha}
         const titulo = idx === 0 ? '📝 Dados da Cotação:' : `📝 Dados da Cotação ${idx + 1}:`;
 
         const valorLinhaDestaque = q.hasDiscount && q.discountedValue
-            ? `~Valor: R$ ${q.value}~\n\n*Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
+            ? `~- Valor: R$ ${q.value}~\n\n*- Valor com desconto ${promoName}: R$ ${q.discountedValue}*`
             : `- Valor: R$ ${q.value}`;
 
         return `${titulo}
